@@ -1,24 +1,33 @@
 <?php
+session_start(); // Start the session
+
 $message = ''; // To hold the notification message
-$otp = '';     // To store the generated OTP
+$otp = ''; // To store the generated OTP
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    include 'db_connection.php';
-    include '2F/otp_generator.php'; // Include the OTP generator file
+    include '../db_connection.php';
+    include '../2F/otp_generator.php'; // Include the OTP generator file
+    include '../PHPMailer/mailer_demo.php'; // Include the mailer file
 
     $id = htmlspecialchars(trim($_POST['id']));
     $username = htmlspecialchars(trim($_POST['username']));
     $email = htmlspecialchars(trim($_POST['email']));
     $password = htmlspecialchars(trim($_POST['password']));
 
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $message = "<div class='alert alert-danger mt-3'>Invalid email format!</div>";
-    } elseif (strlen($password) < 8) {
-        $message = "<div class='alert alert-danger mt-3'>Password must be at least 8 characters long!</div>";
-    } else {
-        try {
-            $pdo = getDbConnection();
+    try {
+        $pdo = getDbConnection();
 
+        // Check if the ID already exists
+        $checkQuery = "SELECT id FROM info WHERE id = :id";
+        $checkStmt = $pdo->prepare($checkQuery);
+        $checkStmt->bindParam(':id', $id);
+        $checkStmt->execute();
+
+        if ($checkStmt->rowCount() > 0) {
+            // ID already exists
+            $message = "<script>alert('The ID already exists in the database. Please use a different ID.');</script>";
+        } else {
+            // Proceed with the insertion
             $query = "INSERT INTO info (id, username, email, password) VALUES (:id, :username, :email, :password)";
             $stmt = $pdo->prepare($query);
 
@@ -33,16 +42,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Generate OTP after successful registration
                 $otp = generate(); // Call the generate function from otp_generator.php
 
-                $message = "<div class='alert alert-success mt-3'>User registered successfully! Your OTP is: $otp</div>";
+                // Store email and OTP in the session
+                $_SESSION['email'] = $email;
+                $_SESSION['otp'] = $otp;
+
+                // Send email with OTP
+                if (sendMail($email, $otp)) {
+                    $message = "<div class='alert alert-success mt-3'>User registered successfully! An OTP has been sent to your email.</div>";
+                } else {
+                    $message = "<div class='alert alert-danger mt-3'>Failed to send OTP. Please try again later.</div>";
+                }
             } else {
                 $message = "<div class='alert alert-danger mt-3'>Failed to register user. Please try again!</div>";
             }
-        } catch (PDOException $e) {
-            $message = "<div class='alert alert-danger mt-3'>Error: " . $e->getMessage() . "</div>";
         }
+    } catch (PDOException $e) {
+        $message = "<div class='alert alert-danger mt-3'>Error: " . $e->getMessage() . "</div>";
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -93,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!-- Notification Message -->
         <?php if (!empty($message)) echo $message; ?>
 
-        <form action="register.php" method="POST">
+        <form id="registrationForm" action="register.php" method="POST">
             <div class="mb-2">
                 <label for="id" class="form-label">ID</label>
                 <input type="text" class="form-control" id="id" name="id" required>
@@ -123,6 +142,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const passwordField = document.getElementById('password');
             passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
         }
+
+        document.getElementById('registrationForm').addEventListener('submit', function (e) {
+            const id = document.getElementById('id').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            // ID Validation
+            if (!id) {
+                alert('ID is required.');
+                e.preventDefault();
+                return;
+            }
+
+            // Username Validation
+            if (username.length < 3) {
+                alert('Username must be at least 3 characters long.');
+                e.preventDefault();
+                return;
+            }
+
+            // Email Validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Invalid email format.');
+                e.preventDefault();
+                return;
+            }
+
+            // Password Validation
+            const passwordRegex = /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/;
+            if (!passwordRegex.test(password)) {
+                alert('Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.');
+                e.preventDefault();
+                return;
+            }
+        });
     </script>
 </body>
 </html>
