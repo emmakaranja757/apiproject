@@ -45,35 +45,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Registration Form</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #702963;
+            color: white;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-size: 14px;
+        }
+        .floating-table {
+            background-color: white;
+            color: black;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            width: 90%;
+            max-width: 500px;
+        }
+        .floating-table h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .form-label {
+            font-size: 13px;
+        }
+        .form-control {
+            height: 32px;
+            font-size: 13px;
+        }
+        button {
+            font-size: 13px;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h2>User Registration Form</h2>
+    <div class="floating-table">
+        <h2 class="text-center">User Registration Form</h2>
         <!-- Notification Message -->
         <?php if (!empty($message)) echo $message; ?>
 
         <form action="register.php" method="POST">
-            <div class="mb-3">
+            <div class="mb-2">
                 <label for="id" class="form-label">ID</label>
                 <input type="text" class="form-control" id="id" name="id" required>
             </div>
-            <div class="mb-3">
+            <div class="mb-2">
                 <label for="username" class="form-label">Username</label>
                 <input type="text" class="form-control" id="username" name="username" required>
             </div>
-            <div class="mb-3">
+            <div class="mb-2">
                 <label for="email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" name="email" required>
             </div>
-            <div class="mb-3">
+            <div class="mb-2">
                 <label for="password" class="form-label">Password</label>
                 <div class="input-group">
                     <input type="password" class="form-control" id="password" name="password" required>
                     <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">Show</button>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Register</button>
-            <button type="reset" class="btn btn-secondary">Reset</button>
+            <button type="submit" class="btn btn-primary w-100">Register</button>
+            <button type="reset" class="btn btn-secondary w-100 mt-2">Reset</button>
         </form>
     </div>
 
