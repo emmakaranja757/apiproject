@@ -1,8 +1,10 @@
 <?php
 $message = ''; // To hold the notification message
+$otp = '';     // To store the generated OTP
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     include 'db_connection.php';
+    include '2F/otp_generator.php'; // Include the OTP generator file
 
     $id = htmlspecialchars(trim($_POST['id']));
     $username = htmlspecialchars(trim($_POST['username']));
@@ -28,7 +30,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bindParam(':password', $hashedPassword);
 
             if ($stmt->execute()) {
-                $message = "<div class='alert alert-success mt-3'>User registered successfully!</div>";
+                // Generate OTP after successful registration
+                $otp = generate(); // Call the generate function from otp_generator.php
+
+                $message = "<div class='alert alert-success mt-3'>User registered successfully! Your OTP is: $otp</div>";
             } else {
                 $message = "<div class='alert alert-danger mt-3'>Failed to register user. Please try again!</div>";
             }
