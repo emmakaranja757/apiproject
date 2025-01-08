@@ -48,7 +48,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Send email with OTP
                 if (sendMail($email, $otp)) {
-                    $message = "<div class='alert alert-success mt-3'>User registered successfully! An OTP has been sent to your email.</div>";
+                    // Redirect to register_user.php after successful email
+                    header("Location: register_user.php");
+                    exit(); // Ensure no further code is executed
                 } else {
                     $message = "<div class='alert alert-danger mt-3'>Failed to send OTP. Please try again later.</div>";
                 }
@@ -172,12 +174,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // Password Validation
-            const passwordRegex = /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/;
-            if (!passwordRegex.test(password)) {
-                alert('Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.');
-                e.preventDefault();
-                return;
-            }
+           // const passwordRegex = /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/;
+           // if (!passwordRegex.test(password)) {
+             //   alert('Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.');
+              //  e.preventDefault();
+               // return;
+           // }
         });
     </script>
 </body>
