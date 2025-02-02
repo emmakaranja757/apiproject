@@ -1,69 +1,3 @@
-<?php
-session_start(); // Start the session
-
-$message = ''; // To hold the notification message
-$otp = ''; // To store the generated OTP
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    include '../db_connection.php';
-    include '../2F/otp_generator.php'; // Include the OTP generator file
-    include '../PHPMailer/mailer_demo.php'; // Include the mailer file
-
-    $id = htmlspecialchars(trim($_POST['id']));
-    $username = htmlspecialchars(trim($_POST['username']));
-    $email = htmlspecialchars(trim($_POST['email']));
-    $password = htmlspecialchars(trim($_POST['password']));
-
-    try {
-        $pdo = getDbConnection();
-
-        // Check if the ID already exists
-        $checkQuery = "SELECT id FROM info WHERE id = :id";
-        $checkStmt = $pdo->prepare($checkQuery);
-        $checkStmt->bindParam(':id', $id);
-        $checkStmt->execute();
-
-        if ($checkStmt->rowCount() > 0) {
-            // ID already exists
-            $message = "<script>alert('The ID already exists in the database. Please use a different ID.');</script>";
-        } else {
-            // Proceed with the insertion
-            $query = "INSERT INTO info (id, username, email, password) VALUES (:id, :username, :email, :password)";
-            $stmt = $pdo->prepare($query);
-
-            $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-
-            $stmt->bindParam(':id', $id);
-            $stmt->bindParam(':username', $username);
-            $stmt->bindParam(':email', $email);
-            $stmt->bindParam(':password', $hashedPassword);
-
-            if ($stmt->execute()) {
-                // Generate OTP after successful registration
-                $otp = generate(); // Call the generate function from otp_generator.php
-
-                // Store email and OTP in the session
-                $_SESSION['email'] = $email;
-                $_SESSION['otp'] = $otp;
-
-                // Send email with OTP
-                if (sendMail($email, $otp)) {
-                    // Redirect to register_user.php after successful email
-                    header("Location: register_user.php");
-                    exit(); // Ensure no further code is executed
-                } else {
-                    $message = "<div class='alert alert-danger mt-3'>Failed to send OTP. Please try again later.</div>";
-                }
-            } else {
-                $message = "<div class='alert alert-danger mt-3'>Failed to register user. Please try again!</div>";
-            }
-        }
-    } catch (PDOException $e) {
-        $message = "<div class='alert alert-danger mt-3'>Error: " . $e->getMessage() . "</div>";
-    }
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,47 +7,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #702963;
+            background: rgba(112, 41, 99, 0.2); /* Faint background color */
             color: white;
             height: 100vh;
             margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
             font-size: 14px;
         }
         .floating-table {
             background-color: white;
             color: black;
+            border: 3px solid #702963; /* Reduced border size */
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             padding: 15px;
-            width: 90%;
-            max-width: 500px;
+            width: 80%;
+            max-width: 350px; /* Minimized form size */
         }
         .floating-table h2 {
-            font-size: 18px;
-            margin-bottom: 15px;
+            font-size: 16px;
+            margin-bottom: 10px;
         }
         .form-label {
-            font-size: 13px;
+            font-size: 12px;
         }
         .form-control {
-            height: 32px;
-            font-size: 13px;
+            height: 28px;
+            font-size: 12px;
         }
         button {
-            font-size: 13px;
+            font-size: 12px;
         }
     </style>
 </head>
 <body>
     <div class="floating-table">
-        <h2 class="text-center">User Registration Form</h2>
-        <!-- Notification Message -->
-        <?php if (!empty($message)) echo $message; ?>
-
+        <h2 class="text-center">Register</h2>
         <form id="registrationForm" action="register.php" method="POST">
             <div class="mb-2">
                 <label for="id" class="form-label">ID</label>
@@ -144,43 +75,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const passwordField = document.getElementById('password');
             passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
         }
-
-        document.getElementById('registrationForm').addEventListener('submit', function (e) {
-            const id = document.getElementById('id').value.trim();
-            const username = document.getElementById('username').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
-
-            // ID Validation
-            if (!id) {
-                alert('ID is required.');
-                e.preventDefault();
-                return;
-            }
-
-            // Username Validation
-            if (username.length < 3) {
-                alert('Username must be at least 3 characters long.');
-                e.preventDefault();
-                return;
-            }
-
-            // Email Validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                alert('Invalid email format.');
-                e.preventDefault();
-                return;
-            }
-
-            // Password Validation
-           // const passwordRegex = /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/;
-           // if (!passwordRegex.test(password)) {
-             //   alert('Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.');
-              //  e.preventDefault();
-               // return;
-           // }
-        });
     </script>
 </body>
 </html>
