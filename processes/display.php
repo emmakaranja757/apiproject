@@ -38,11 +38,14 @@
 </head>
 <body>
 
-  <!-- Navigation Bar -->
-  <nav class="navbar navbar-expand-lg" style="background-color: #343a40;">
+  <!-- Font Awesome for icons -->
+<script src="https://kit.fontawesome.com/your-kit-id.js" crossorigin="anonymous"></script>
+
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg" style="background-color: #343a40;">
   <div class="container-fluid">
     <a class="navbar-brand d-flex align-items-center text-white" href="#">
-      <img src="https://via.placeholder.com/50" alt="Logo" class="d-inline-block align-text-top">
+      <i class="fas fa-building fa-2x"></i> <!-- Font Awesome icon -->
       <span class="ms-2 text-white">RealEstateCo</span>
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
