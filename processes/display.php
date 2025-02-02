@@ -42,7 +42,7 @@
   <nav class="navbar navbar-expand-lg" style="background-color: #343a40;">
   <div class="container-fluid">
     <a class="navbar-brand d-flex align-items-center text-white" href="#">
-      <img src="../IMAGES/logo.png" alt="Logo" class="d-inline-block align-text-top">
+      <img src="../IMAGES/logo2.jpeg" alt="Logo" style="width: 52px; height: 50px;">
       <span class="ms-2 text-white">RealEstateCo</span>
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
