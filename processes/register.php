@@ -7,7 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background: rgba(112, 41, 99, 0.2); /* Faint background color */
+            background: url('../IMAGES/background.jpeg') no-repeat center center fixed;
+            background-size: cover;
             color: white;
             height: 100vh;
             margin: 0;
@@ -15,10 +16,22 @@
             justify-content: center;
             align-items: center;
             font-size: 14px;
+            position: relative;
+        }
+        
+        .background-blur {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            filter: blur(8px);
+            z-index: -1;
         }
         .floating-table {
             background-color: white;
-            color: black;
+            color: black; font-weight: bold;
             border: 3px solid #702963; /* Reduced border size */
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -31,7 +44,7 @@
             margin-bottom: 10px;
         }
         .form-label {
-            font-size: 12px;
+            font-size: 12px; font-weight: bold;
         }
         .form-control {
             height: 28px;
@@ -42,17 +55,17 @@
         }
     </style>
 </head>
-<body>
-    <div class="floating-table">
-        <h2 class="text-center">Register</h2>
+<div class="background-blur"></div>
+<div class="floating-table">
+        <h2 class="text-center">REGISTER</h2>
         <form id="registrationForm" action="register.php" method="POST">
             <div class="mb-2">
                 <label for="id" class="form-label">ID</label>
                 <input type="text" class="form-control" id="id" name="id" required>
             </div>
             <div class="mb-2">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" class="form-control" id="username" name="username" required>
+                <label for="fullname" class="form-label">Fullname</label>
+                <input type="text" class="form-control" id="fullname" name="fullname" required>
             </div>
             <div class="mb-2">
                 <label for="email" class="form-label">Email</label>
