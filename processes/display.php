@@ -72,7 +72,7 @@
           <a class="nav-link text-white" href="#pricing">Pricing</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white" href="signup.php">Sign Up</a>
+          <a class="nav-link text-white" href="register.php">Register</a>
         </li>
         <li class="nav-item">
           <a class="nav-link text-white" href="login.php">Log In</a>
