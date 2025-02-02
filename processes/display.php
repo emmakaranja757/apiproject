@@ -151,7 +151,7 @@
   </div>
 
   <!-- Footer -->
-  <footer class="bg-dark text-white pt-4">
+  <footer class="text-white pt-4" style="background-color: #343a40;">
   <div class="container">
     <div class="row">
       <!-- Company Info -->
