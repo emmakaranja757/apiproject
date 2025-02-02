@@ -39,47 +39,48 @@
 <body>
 
   <!-- Navigation Bar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container-fluid">
-      <a class="navbar-brand d-flex align-items-center" href="#">
-        <img src="https://via.placeholder.com/50" alt="Logo" class="d-inline-block align-text-top">
-        <span class="ms-2">RealEstateCo</span>
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              About Us
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="aboutDropdown">
-              <li><a class="dropdown-item" href="#about">Overview</a></li>
-              <li><a class="dropdown-item" href="#ourHistory">Our History</a></li>
-              <li><a class="dropdown-item" href="#ourTeam">Our Team</a></li>
-              <li><a class="dropdown-item" href="#ourValues">Our Values</a></li>
-            </ul>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#features">Features</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#pricing">Pricing</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="signup.php">Sign Up</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="login.php">Log In</a>
-          </li>
-        </ul>
-      </div>
+  <nav class="navbar navbar-expand-lg" style="background-color: #343a40;">
+  <div class="container-fluid">
+    <a class="navbar-brand d-flex align-items-center text-white" href="#">
+      <img src="https://via.placeholder.com/50" alt="Logo" class="d-inline-block align-text-top">
+      <span class="ms-2 text-white">RealEstateCo</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link text-white" aria-current="page" href="#">Home</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-white" href="#" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            About Us
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="aboutDropdown">
+            <li><a class="dropdown-item" href="#about">Overview</a></li>
+            <li><a class="dropdown-item" href="#ourHistory">Our History</a></li>
+            <li><a class="dropdown-item" href="#ourTeam">Our Team</a></li>
+            <li><a class="dropdown-item" href="#ourValues">Our Values</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="#features">Features</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="#pricing">Pricing</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="signup.php">Sign Up</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="login.php">Log In</a>
+        </li>
+      </ul>
     </div>
-  </nav>
+  </div>
+</nav>
+
 
   <!-- Slideshow -->
   <div id="propertyCarousel" class="carousel slide mt-4" data-bs-ride="carousel">
