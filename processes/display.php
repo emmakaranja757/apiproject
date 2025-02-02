@@ -6,6 +6,7 @@
   <title>Real Estate Platform</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
   <!-- Custom CSS for Navbar and Slideshow -->
   <style>
@@ -162,13 +163,16 @@
       
       <!-- Contact Info -->
       <div class="col-md-4 mb-3">
-        <h5>Contact Us</h5>
-        <ul class="list-unstyled">
-          <li><strong>Email:</strong> info@sawaburealestateco.com</li>
-          <li><strong>Phone:</strong> +254700976434</li>
-          <li><strong>Address:</strong> Kiambu rd, Kiambu, Kenya</li>
-        </ul>
-      </div>
+      <h5>Contact Us</h5>
+      <ul class="list-unstyled">
+    <li><i class="fas fa-envelope-open-text"></i> <strong>Email:</strong> info@sawaburealestateco.com</li>
+    <li><i class="fas fa-phone-alt"></i> <strong>Phone:</strong> +254700976434</li>
+    <li><i class="fas fa-map-marker-alt"></i> <strong>Address:</strong> Kiambu Rd, Kiambu, Kenya</li>
+    <li><i class="fas fa-clock"></i> <strong>Hours:</strong> Mon - Fri, 9 AM - 6 PM</li>
+    </ul>
+    </div>
+
+
       
       <!-- Newsletter Subscription -->
       <div class="col-md-4 mb-3">
