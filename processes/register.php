@@ -32,7 +32,7 @@
         .floating-table {
             background-color: white;
             color: black; font-weight: bold;
-            border: 3px solid #702963; /* Reduced border size */
+            border: 3px solid #000000; /* Reduced border size */
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             padding: 15px;
