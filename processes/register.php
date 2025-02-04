@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Real Estate Platform </title>
+    <title>Signup- Real Estate Platform </title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -40,7 +40,7 @@
             max-width: 350px; /* Minimized form size */
         }
         .floating-table h2 {
-            font-size: 16px;
+            font-size: 22px;
             margin-bottom: 10px;
         }
         .form-label {
@@ -57,7 +57,7 @@
 </head>
 <div class="background-blur"></div>
 <div class="floating-table">
-        <h2 class="text-center">REGISTER</h2>
+        <h2 class="text-center">Sign Up</h2>
         <form id="registrationForm" action="register.php" method="POST">
             <div class="mb-2">
                 <label for="id" class="form-label">ID</label>

@@ -89,7 +89,7 @@
                 <button type="submit" class="btn btn-primary">Login</button>
             </form>
             <p class="mt-3 text-center">
-                Don't have an account? <a href="signup.php">Sign up</a>
+                Don't have an account? <a href="register.php">Signup</a>
             </p>
         </div>
     </div>
