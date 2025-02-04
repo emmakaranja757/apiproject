@@ -34,7 +34,7 @@
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-            border: 4px solid #000000; 
+            border: 3px solid #000000; 
         }
 
         /* Centering */
