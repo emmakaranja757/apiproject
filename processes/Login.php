@@ -1,3 +1,47 @@
+<?php
+session_start();
+
+// Database connection
+$host = 'localhost'; 
+$dbname = 'users'; 
+$username = 'root'; 
+$password = '425096'; 
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+
+if (isset($_POST['login'])) {
+    $email = trim($_POST['email']);
+    $password = trim($_POST['password']);
+
+    // Prepare SQL query
+    $sql = "SELECT * FROM info WHERE Email = :email";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+    $stmt->execute();
+
+    // Fetch user data
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Debugging output
+    var_dump($user);
+
+    if ($user && password_verify($password, $user['Password'])) {
+        // Successful login
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['fullname'] = $user['fullname'];
+        $_SESSION['email'] = $user['Email'];
+        echo "<script>alert('Login Successful!'); window.location.href='dashboard.php';</script>";
+    } else {
+        echo "<script>alert('Invalid email or password!');</script>";
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

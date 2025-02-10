@@ -1,3 +1,16 @@
+<?php
+require '../Dbconn/db_connection.php';
+
+if(isset($_POST['register'])){
+    $fullname = $_POST['fullname'];
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    $sql = "INSERT INTO info(fullname, Email, Password) VALUES('$fullname', '$email', ''$password')";
+    $stmt = $pdo->prepare($sql);
+    $stmt -> execute();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -60,10 +73,6 @@
         <h2 class="text-center">Sign Up</h2>
         <form id="registrationForm" action="register.php" method="POST">
             <div class="mb-2">
-                <label for="id" class="form-label">ID</label>
-                <input type="text" class="form-control" id="id" name="id" required>
-            </div>
-            <div class="mb-2">
                 <label for="fullname" class="form-label">Fullname</label>
                 <input type="text" class="form-control" id="fullname" name="fullname" required>
             </div>
@@ -78,7 +87,7 @@
                     <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">Show</button>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary w-100">Register</button>
+            <button type="submit" class="btn btn-primary w-100" name = "register">Register</button>
             <button type="reset" class="btn btn-secondary w-100 mt-2">Reset</button>
         </form>
     </div>
