@@ -6,34 +6,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         echo "<div class='alert alert-danger mt-3'>Invalid email format!</div>";
     } else {
-        // Check if the email exists in the database
-        $pdo = new PDO("mysql:host=localhost;dbname=users", "root", "");
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
-        $stmt->bindParam(':email', $email);
-        $stmt->execute();
+        try {
+            // Database connection with error handling
+            $pdo = new PDO("mysql:host=localhost;dbname=users", "root", "425096", [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+            ]);
 
-        if ($stmt->rowCount() > 0) {
-            // Email exists, generate unique code
-            $code = rand(100000, 999999);  // A random 6-digit code
-            // Save the code and timestamp in the database for 2FA verification
-            $stmt = $pdo->prepare("UPDATE users SET reset_code = :code, code_timestamp = NOW() WHERE email = :email");
-            $stmt->bindParam(':code', $code);
+            // Check if email exists
+            $stmt = $pdo->prepare("SELECT * FROM info WHERE email = :email");
             $stmt->bindParam(':email', $email);
             $stmt->execute();
 
-            // Send the code to the user's email
-            mail($email, "Password Reset Code", "Your password reset code is: $code");
+            if ($stmt->rowCount() > 0) {
+                // Email exists, generate a 6-digit reset code
+                $code = rand(100000, 999999);
 
-            echo "<div class='alert alert-success mt-3'>A password reset code has been sent to your email!</div>";
-            // Redirect to the page where the user can enter the code
-            header("Location: verify_code.php?email=" . urlencode($email));
-            exit();
-        } else {
-            echo "<div class='alert alert-danger mt-3'>Email not found!</div>";
+                // Save code in the database
+                $stmt = $pdo->prepare("UPDATE info SET reset_code = :code, code_timestamp = NOW() WHERE email = :email");
+                $stmt->bindParam(':code', $code);
+                $stmt->bindParam(':email', $email);
+                $stmt->execute();
+
+                // Send reset code to user's email
+                $subject = "Password Reset Code";
+                $message = "Your password reset code is: $code";
+                $headers = "From: noreply@yourdomain.com\r\n"; // Change the email to a valid one
+
+                if (mail($email, $subject, $message, $headers)) {
+                    // Redirect before any HTML output
+                    header("Location: verify_code.php?email=" . urlencode($email));
+                    exit();
+                } else {
+                    echo "<div class='alert alert-danger mt-3'>Failed to send email. Please try again later.</div>";
+                }
+            } else {
+                echo "<div class='alert alert-danger mt-3'>Email not found!</div>";
+            }
+        } catch (PDOException $e) {
+            echo "<div class='alert alert-danger mt-3'>Database Error: " . $e->getMessage() . "</div>";
         }
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
