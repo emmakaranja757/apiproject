@@ -39,12 +39,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2>Change Your Password</h2>
         <form action="change_password.php" method="POST">
             <div class="mb-3">
-                <label for="email" class="form-label">Your email address</label>
-                <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($_GET['email']); ?>" required readonly>
+                <input type="hidden" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($_GET['email']); ?>" required readonly>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Enter new password</label>
                 <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Confirm new password</label>
+                <input type="password" class="form-control" id="cpassword" name="cpassword" required>
             </div>
             <button type="submit" class="btn btn-primary">Change Password</button>
         </form>
