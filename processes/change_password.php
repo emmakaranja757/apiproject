@@ -11,14 +11,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
 
         // Update the user's password in the database
-        $pdo = new PDO("mysql:host=localhost;dbname=users", "root", "");
-        $stmt = $pdo->prepare("UPDATE users SET password = :password WHERE email = :email");
+        $pdo = new PDO("mysql:host=localhost;dbname=users", "root", "425096");
+        $stmt = $pdo->prepare("UPDATE info SET password = :password WHERE email = :email");
         $stmt->bindParam(':password', $hashed_password);
         $stmt->bindParam(':email', $email);
         $stmt->execute();
 
         // Optionally, you can clear the reset code after successful password change
-        $stmt = $pdo->prepare("UPDATE users SET reset_code = NULL, code_timestamp = NULL WHERE email = :email");
+        $stmt = $pdo->prepare("UPDATE info SET reset_code = NULL, code_timestamp = NULL WHERE email = :email");
         $stmt->bindParam(':email', $email);
         $stmt->execute();
 

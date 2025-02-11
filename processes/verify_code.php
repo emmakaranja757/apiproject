@@ -4,8 +4,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $entered_code = htmlspecialchars(trim($_POST['code']));
 
     // Retrieve the reset code from the database for the provided email
-    $pdo = new PDO("mysql:host=localhost;dbname=users", "root", "");
-    $stmt = $pdo->prepare("SELECT reset_code, code_timestamp FROM users WHERE email = :email");
+    $pdo = new PDO("mysql:host=localhost;dbname=users", "root", "425096");
+    $stmt = $pdo->prepare("SELECT reset_code, code_timestamp FROM info WHERE email = :email");
     $stmt->bindParam(':email', $email);
     $stmt->execute();
     $user = $stmt->fetch();

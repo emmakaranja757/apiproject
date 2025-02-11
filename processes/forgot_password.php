@@ -27,12 +27,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->bindParam(':email', $email);
                 $stmt->execute();
 
+                $mail = require __DIR__ . '/mailer_demo.php';
                 // Send reset code to user's email
-                $subject = "Password Reset Code";
-                $message = "Your password reset code is: $code";
-                $headers = "From: noreply@yourdomain.com\r\n"; // Change the email to a valid one
+                $mail -> setFrom("sawabu@gmail.com","Sawabu Ltd");
+                $mail-> addAddress($email);
+                $mail->Subject = "Password Reset Code";
+                $mail->Body = "Your password reset code is: $code";
+                $mail->Headers = "From: noreply@yourdomain.com\r\n"; // Change the email to a valid one
+               try{
+                $mail->send();
+               }catch(Exception){
+                echo "Message could not be sent. Mailer error: {$mail->ErrorInfo}";
+               }
 
-                if (mail($email, $subject, $message, $headers)) {
+                if ($mail) {
                     // Redirect before any HTML output
                     header("Location: verify_code.php?email=" . urlencode($email));
                     exit();
