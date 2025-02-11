@@ -19,20 +19,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($stmt->rowCount() > 0) {
                 // Email exists, generate a 6-digit reset code
-                $code = rand(100000, 999999);
+                $reset_code = rand(100000, 999999);
 
                 // Save code in the database
-                $stmt = $pdo->prepare("UPDATE info SET reset_code = :code, code_timestamp = NOW() WHERE email = :email");
-                $stmt->bindParam(':code', $code);
+                $stmt = $pdo->prepare("UPDATE info SET reset_code = :reset_code, code_timestamp = NOW() WHERE email = :email");
+                $stmt->bindParam(':reset_code', $reset_code);
                 $stmt->bindParam(':email', $email);
                 $stmt->execute();
+                //DEBUG: Print the generated code
+                echo "DEBUG: New Generated Code: ";
 
                 $mail = require __DIR__ . '/mailer_demo.php';
                 // Send reset code to user's email
                 $mail -> setFrom("sawabu@gmail.com","Sawabu Ltd");
                 $mail-> addAddress($email);
                 $mail->Subject = "Password Reset Code";
-                $mail->Body = "Your password reset code is: $code";
+                $mail->Body = "Your password reset code is: $reset_code";
                 $mail->Headers = "From: noreply@yourdomain.com\r\n"; // Change the email to a valid one
                try{
                 $mail->send();

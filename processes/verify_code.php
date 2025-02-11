@@ -1,7 +1,10 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = htmlspecialchars(trim($_POST['email']));
-    $entered_code = htmlspecialchars(trim($_POST['code']));
+    $email = htmlspecialchars(trim($_POST['email']??''));
+    $entered_code = htmlspecialchars(trim($_POST['code']?? ''));
+
+    echo "DEBUG: Entered Code: " . htmlspecialchars($entered_code) . "<br>";
+
 
     // Retrieve the reset code from the database for the provided email
     $pdo = new PDO("mysql:host=localhost;dbname=users", "root", "425096");
@@ -10,7 +13,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute();
     $user = $stmt->fetch();
 
-    if ($user && $user['reset_code'] == $entered_code) {
+    /*if ($user) {
+        echo "DEBUG: Fetched Stored Code: " . htmlspecialchars($user['reset_code']) . "<br>";
+    } else {
+        echo "DEBUG: No user found for this email!<br>";
+    }
+        echo "DEBUG: Entered Code: '" . htmlspecialchars($entered_code) . "<br>";
+        echo "Code Match: " . (trim($user['reset_code'])== $entered_code ? "YES" : "NO") . "<br>";
+        exit();
+    }*/
+    
+    if ($user && trim($user['reset_code']) ===trim($entered_code)) { 
+
         // Verify if the code has expired (e.g., valid for 15 minutes)
         $timestamp = strtotime($user['code_timestamp']);
         $current_time = time();
@@ -28,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "<div class='alert alert-danger mt-3'>Invalid code!</div>";
     }
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -99,32 +114,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container">
         <img src="../IMAGES/envelope.jpeg" alt="Verification Illustration" class="illustration">
         <h3>Verify Code</h3>
+         <!-- Show error message at the top -->
+         <?php
+        session_start();
+        if (isset($_SESSION['error'])) {
+            echo "<div class='alert alert-danger' style='text-align: center;'>
+                    " . $_SESSION['error'] . "
+                  </div>";
+            unset($_SESSION['error']); // Clear error after displaying
+        }
+        ?>
         <p>We have sent a verification code to your email. Please enter the code below.</p>
         
-        <form action="verify_code.php" method="POST">
-            <input type="hidden" name="email" value="<?php echo htmlspecialchars($_GET['email']); ?>">
+        <form action="verify_code.php" method="POST" onsubmit="combineCode()">
+            <input type="hidden" name="email" value="<?php echo htmlspecialchars($_GET['email'] ?? ''); ?>">
+            <input type="hidden" name="code" id="fullCode">
+
             <div class="code-input">
-                <input type="text" maxlength="1" required oninput="moveToNext(this, 0)">
-                <input type="text" maxlength="1" required oninput="moveToNext(this, 1)">
-                <input type="text" maxlength="1" required oninput="moveToNext(this, 2)">
-                <input type="text" maxlength="1" required oninput="moveToNext(this, 3)">
-                <input type="text" maxlength="1" required oninput="moveToNext(this, 4)">
-                <input type="text" maxlength="1" required oninput="moveToNext(this, 5)">
+                <input type="text" maxlength="1"  required oninput="moveToNext(this, 0)">
+                <input type="text" maxlength="1"  required oninput="moveToNext(this, 1)">
+                <input type="text" maxlength="1"  required oninput="moveToNext(this, 2)">
+                <input type="text" maxlength="1"  required oninput="moveToNext(this, 3)">
+                <input type="text" maxlength="1"  required oninput="moveToNext(this, 4)">
+                <input type="text" maxlength="1"  required oninput="moveToNext(this, 5)">
             </div>
             <button type="submit" class="btn btn-primary w-100">Verify Code</button>
         </form>
+     <script>
+    function combineCode() {
+        let inputs = document.querySelectorAll(".code-input input");
+        let fullCode = "";
+        inputs.forEach(input => {
+            fullCode += input.value;
+        });
+        document.getElementById("fullCode").value = fullCode;
+    }
+    function moveToNext(input, index) {
+        let inputs = document.querySelectorAll('.code-input input');
+        if (input.value.length === 1 && index < inputs.length - 1) {
+            inputs[index + 1].focus();
+        }
+    }
+      </script>
 
         <!-- Resend Code + Countdown Timer -->
         <div class="resend-container">
             <div id="resend" class="resend-btn disabled" onclick="resendCode()">
                 Resend Code
             </div>
-            <span id="countdown">(60s)</span>
+            <span id="countdown">(180s)</span>
         </div>
     </div>
 
     <script>
-        let timeLeft = 60;
+        let timeLeft = 180;
         let countdownElement = document.getElementById("countdown");
         let resendButton = document.getElementById("resend");
 
