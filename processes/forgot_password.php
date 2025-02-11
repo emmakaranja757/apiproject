@@ -64,17 +64,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forgot Password</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            display: flex;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 800px;
+            border: 2px solid #ccc;
+        }
+        .illustration-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #e9ecef;
+            padding: 20px;
+        }
+        .illustration {
+            width: 100%;
+            max-width: 300px;
+        }
+        .form-container {
+            flex: 1;
+            padding: 30px;
+            text-align: center;
+        }
+        .btn-primary {
+            width: 100%;
+            border-radius: 25px;
+        }
+        .form-control {
+            border-radius: 25px;
+            padding: 12px;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h2>Forgot Password</h2>
-        <form action="forgot_password.php" method="POST">
-            <div class="mb-3">
-                <label for="email" class="form-label">Enter your email address</label>
-                <input type="email" class="form-control" id="email" name="email" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Send Reset Code</button>
-        </form>
+    <div class="container">
+        <div class="illustration-container">
+            <img src="../IMAGES/forgotpassword.jpeg" alt="Forgot Password Illustration" class="illustration">
+        </div>
+        <div class="form-container">
+            <h3 class="mb-3">Forgot Password?</h3>
+            <p class="text-muted">Enter your email address </p>
+            <form action="forgot_password.php" method="POST">
+                <div class="mb-3">
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter Email Address" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Next</button>
+            </form>
+        </div>
     </div>
 </body>
 </html>
