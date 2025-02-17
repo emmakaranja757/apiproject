@@ -1,49 +1,38 @@
 <?php
+session_start();
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = htmlspecialchars(trim($_POST['email']??''));
-    $entered_code = htmlspecialchars(trim($_POST['code']?? ''));
+    $email = htmlspecialchars(trim($_POST['email'] ?? ''));
+    $entered_code = htmlspecialchars(trim($_POST['code'] ?? ''));
 
-    echo "DEBUG: Entered Code: " . htmlspecialchars($entered_code) . "<br>";
+    // Debugging output (remove in production)
+    echo "<pre>";
+echo "DEBUG: Stored Email in Session: " . ($_SESSION['email'] ?? 'No Email in session') . "<br>";
+echo "DEBUG: Stored OTP in Session: " . ($_SESSION['otp'] ?? 'No OTP in session') . "<br>";
+echo "</pre>";
+    // Retrieve the OTP from session
+    $stored_otp = $_SESSION['otp'] ;
+    $stored_email = $_SESSION['email'] ;
 
-
-    // Retrieve the reset code from the database for the provided email
-    $pdo = new PDO("mysql:host=localhost;dbname=users", "root", "425096");
-    $stmt = $pdo->prepare("SELECT reset_code, code_timestamp FROM info WHERE email = :email");
-    $stmt->bindParam(':email', $email);
-    $stmt->execute();
-    $user = $stmt->fetch();
-
-    /*if ($user) {
-        echo "DEBUG: Fetched Stored Code: " . htmlspecialchars($user['reset_code']) . "<br>";
-    } else {
-        echo "DEBUG: No user found for this email!<br>";
-    }
-        echo "DEBUG: Entered Code: '" . htmlspecialchars($entered_code) . "<br>";
-        echo "Code Match: " . (trim($user['reset_code'])== $entered_code ? "YES" : "NO") . "<br>";
+    if (!$stored_otp || !$stored_email) {
+        echo "<div class='alert alert-danger mt-3'>Session expired or no OTP found!</div>";
         exit();
-    }*/
-    
-    if ($user && trim($user['reset_code']) ===trim($entered_code)) { 
+    }
 
-        // Verify if the code has expired (e.g., valid for 15 minutes)
-        $timestamp = strtotime($user['code_timestamp']);
-        $current_time = time();
 
-        if (($current_time - $timestamp) <= 900) { // 15 minutes
-            // Code is valid and hasn't expired
-            echo "<div class='alert alert-success mt-3'>Code verified successfully!</div>";
-            // Redirect to change password page
-            header("Location: change_password.php?email=" . urlencode($email));
-            exit();
-        } else {
-            echo "<div class='alert alert-danger mt-3'>The code has expired!</div>";
-        }
+    // Verify the entered code
+    if (trim($stored_otp) === trim($entered_code)) {
+        echo "<div class='alert alert-success mt-3'>Code verified successfully!</div>";
+
+        // Redirect to change password page
+        header("Location: change_password.php?email=" . urlencode($email));
+        exit();
     } else {
-        echo "<div class='alert alert-danger mt-3'>Invalid code!</div>";
+        echo "<div class='alert alert-danger mt-3'>Invalid OTP!</div>";
     }
 }
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -111,12 +100,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
+
     <div class="container">
         <img src="../IMAGES/envelope.jpeg" alt="Verification Illustration" class="illustration">
         <h3>Verify Code</h3>
          <!-- Show error message at the top -->
          <?php
-        session_start();
+       
         if (isset($_SESSION['error'])) {
             echo "<div class='alert alert-danger' style='text-align: center;'>
                     " . $_SESSION['error'] . "

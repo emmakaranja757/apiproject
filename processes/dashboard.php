@@ -1,3 +1,37 @@
+<?php
+// Connect to database
+$conn = new mysqli("localhost", "root", "425096", "users");
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch Properties
+$properties = $conn->query("
+    SELECT property_id, property_name, location, price, status, created_at
+    FROM properties
+");
+
+// Fetch Transactions
+$transactions = $conn->query("
+    SELECT t.transaction_id, p.property_name, i.fullname AS buyer, t.amount, t.transaction_date
+    FROM transactions t
+    JOIN properties p ON t.property_id = p.property_id
+    JOIN info i ON t.info_id = i.info_id
+");
+
+// Fetch Payments
+$payments = $conn->query("
+    SELECT py.payment_id, i.fullname AS payer, t.transaction_id, py.amount, py.payment_method, py.status, py.payment_date
+    FROM payments py
+    JOIN transactions t ON py.transaction_id = t.transaction_id
+    JOIN info i ON py.info_id = i.info_id
+");
+
+$conn->close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -40,62 +74,103 @@
 <body>
     <div class="sidebar">
         <a href="#overview">Dashboard</a>
-        <a href="#users">User Management</a>
-        <a href="#properties">Properties</a>
         <a href="#transactions">Transactions</a>
-        <a href="#settings">Settings</a>
+        <a href="#payments">Payments</a>
+        <a href="#properties">Properties</a>
     </div>
 
     <div class="content">
         <h2>Admin Dashboard</h2>
-        
-        <!-- System Overview -->
-        <div id="overview" class="row">
-            <div class="col-md-3">
-                <div class="card p-3">
-                    <h5>Total Users</h5>
-                    <h3>1,234</h3>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card p-3">
-                    <h5>Total Properties</h5>
-                    <h3>567</h3>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card p-3">
-                    <h5>Total Transactions</h5>
-                    <h3>89</h3>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card p-3">
-                    <h5>Total Revenue</h5>
-                    <h3>$120,000</h3>
-                </div>
-            </div>
+
+        <!-- Properties Table -->
+        <div id="properties">
+            <h3>Properties</h3>
+            <table class="table table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Location</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($row = $properties->fetch_assoc()): ?>
+                        <tr>
+                            <td><?php echo $row['property_id']; ?></td>
+                            <td><?php echo $row['property_name']; ?></td>
+                            <td><?php echo $row['location']; ?></td>
+                            <td>$<?php echo number_format($row['price'], 2); ?></td>
+                            <td><?php echo $row['status']; ?></td>
+                            <td><?php echo $row['created_at']; ?></td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
         </div>
-        
-        <!-- Quick Actions -->
-        <div class="mt-4">
-            <button class="btn btn-outline-primary">Add Property</button>
-            <button class="btn btn-outline-secondary">Manage Users</button>
-            <button class="btn btn-outline-dark">Track Memberships</button>
+
+        <!-- Transactions Table -->
+        <div id="transactions">
+            <h3>Transactions</h3>
+            <table class="table table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Property</th>
+                        <th>Buyer</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($row = $transactions->fetch_assoc()): ?>
+                        <tr>
+                            <td><?php echo $row['transaction_id']; ?></td>
+                            <td><?php echo $row['property_name']; ?></td>
+                            <td><?php echo $row['buyer']; ?></td>
+                            <td>$<?php echo number_format($row['amount'], 2); ?></td>
+                            <td><?php echo $row['transaction_date']; ?></td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
         </div>
-        
-        <!-- Recent Activity -->
-        <div class="mt-4">
-            <h4>Recent Activity</h4>
-            <ul class="list-group">
-                <li class="list-group-item">New user registered - John Doe</li>
-                <li class="list-group-item">Property "Luxury Villa" sold for $500,000</li>
-                <li class="list-group-item">Transaction completed: $12,500</li>
-            </ul>
+
+        <!-- Payments Table -->
+        <div id="payments" class="mt-5">
+            <h3>Payments</h3>
+            <table class="table table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Payment ID</th>
+                        <th>Payer</th>
+                        <th>Transaction ID</th>
+                        <th>Amount</th>
+                        <th>Method</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($row = $payments->fetch_assoc()): ?>
+                        <tr>
+                            <td><?php echo $row['payment_id']; ?></td>
+                            <td><?php echo $row['payer']; ?></td>
+                            <td><?php echo $row['transaction_id']; ?></td>
+                            <td>$<?php echo number_format($row['amount'], 2); ?></td>
+                            <td><?php echo $row['payment_method']; ?></td>
+                            <td><?php echo $row['status']; ?></td>
+                            <td><?php echo $row['payment_date']; ?></td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
         </div>
-        
-        <!-- Transactions Section -->
-        <div id="transactions" class="mt-5">
+
+        <!-- Transactions Chart -->
+        <div class="mt-5">
             <h3>Transaction Flow</h3>
             <canvas id="transactionChart"></canvas>
         </div>

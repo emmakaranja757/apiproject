@@ -2,6 +2,8 @@
 session_start();
 require '../Dbconn/db_connection.php'; // Ensure this file exists and connects properly
 
+ $pdo = getDatabaseConnection();
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);

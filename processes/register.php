@@ -1,16 +1,84 @@
 <?php
-require '../Dbconn/db_connection.php';
+session_start();
+require '../Dbconn/db_connection.php'; // Ensure this file contains the function getDatabaseConnection()
 
-if(isset($_POST['register'])){
-    $fullname = $_POST['fullname'];
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+$pdo = getDatabaseConnection(); // Call the function to get the PDO connection
 
-    $sql = "INSERT INTO info(fullname, Email, Password) VALUES('$fullname', '$email', ''$password')";
-    $stmt = $pdo->prepare($sql);
-    $stmt -> execute();
+if (isset($_POST['register'])) {
+    $fullname = trim($_POST['fullname']);
+    $email = trim($_POST['email']);
+    $password = password_hash(trim($_POST['password']), PASSWORD_BCRYPT); // Secure password hashing
+
+    try {
+        // **Check if email already exists**
+        $checkSql = "SELECT COUNT(*) FROM info WHERE Email = :email";
+        $checkStmt = $pdo->prepare($checkSql);
+        $checkStmt->bindParam(':email', $email, PDO::PARAM_STR);
+        $checkStmt->execute();
+        $emailExists = $checkStmt->fetchColumn();
+
+        if ($emailExists) {
+            echo "<script>alert('Email is already registered. Please use another email.'); window.location.href='register.php';</script>";
+            exit();
+        }
+
+        // **Insert new user**
+        $sql = "INSERT INTO info (fullname, Email, `Password`) VALUES (:fullname, :email, :password)";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':fullname', $fullname, PDO::PARAM_STR);
+        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+        $stmt->bindParam(':password', $password, PDO::PARAM_STR);
+
+        if ($stmt->execute()) {
+            echo "<script>alert('Registration successful!');</script>";
+        } else {
+            echo "<script>alert('Registration failed. Please try again.');</script>";
+            exit();
+        }
+    } catch (PDOException $e) {
+        echo "<script>alert('Database Error: " . $e->getMessage() . "');</script>";
+        exit();
+    }
+
+    include('../2F/otp_generator.php');
+    include('../PHPMailer/mailer_demo.php');
+
+    $otp = generate();
+    
+    // **Store OTP & email in session**
+    $_SESSION['otp'] = $otp;
+    $_SESSION['email'] = $email;
+
+    // **Debugging output (Remove in production)**
+    error_log("DEBUG: OTP stored in session: " . $_SESSION['otp']);
+    error_log("DEBUG: Email stored in session: " . $_SESSION['email']);
+
+    $name = $fullname;
+    $Subject = "Registration";
+    $Body = "<html>
+                <body>
+                    <div><strong>Hello, $name</strong></div><br><br>
+                    <div style='padding-top:8px;'>
+                    You have successfully registered. To verify your account, 
+                    use the OTP below and enter it on the verification page. 
+                    <br><br>Your OTP: <strong>$otp</strong><br>
+                    </div>
+                </body>
+            </html>";
+
+    if (sendMail($email, $Subject, $Body, $name)) {
+        echo "<script>
+               alert('Email sent successfully. Please check your inbox.');
+               window.location.href='verify_code.php';
+              </script>";
+    } else {
+        echo "<script>alert('Email sending failed. Please check your SMTP settings.');</script>";
+    }
 }
 ?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
