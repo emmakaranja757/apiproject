@@ -1,5 +1,9 @@
 <?php
 session_start();
+error_reporting(E_ALL);
+include('../../Dbconn/db_connection.php'); // Ensure this file exists and connects properly
+
+$pdo = getDatabaseConnection(); // Ensure this function returns a valid PDO object
 
 // If already logged in, redirect to admin dashboard
 if (isset($_SESSION['email'])) {
@@ -12,36 +16,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // Connect to database
-    $conn = new mysqli("localhost", "root", "425096", "users");
+    // Query to check email
+    $stmt = $pdo->prepare("SELECT * FROM info WHERE Email = ?");
+    $stmt->execute([$email]);
+    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Check connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
+    if ($admin) {
+        // Verify the hashed password
+        if (password_verify($password, $admin['Password'])) {
+            // Store admin email in session
+            $_SESSION['email'] = $admin['Email'];
 
-    // Query to check email and password
-    $stmt = $conn->prepare("SELECT * FROM info WHERE email = ? AND password = ?");
-    $stmt->bind_param("ss", $email, $password); // Bind parameters (email and password)
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    // Check if admin exists
-    if ($result->num_rows > 0) {
-        // Fetch admin data and store in session
-        $admin = $result->fetch_assoc();
-        $_SESSION['email'] = $admin['email'];  // Store admin email in session
-
-        // Redirect to dashboard
-        header("Location: admin_dashboard.php");
-        exit();
+            // Redirect to dashboard
+            header("Location: admin_dashboard.php");
+            exit();
+        } else {
+            $error_message = "Invalid email or password!";
+        }
     } else {
         $error_message = "Invalid email or password!";
     }
-
-    $conn->close();
 }
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <style>
         /* Background Blur Effect */
         body {
-            background: url('../IMAGES/background.jpeg') no-repeat center center fixed;
+            background: url('../../IMAGES/background.jpeg') no-repeat center center fixed;
             background-size: cover;
             position: relative;
         }
