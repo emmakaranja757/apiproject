@@ -1,3 +1,47 @@
+<?php
+session_start();
+
+// If already logged in, redirect to admin dashboard
+if (isset($_SESSION['email'])) {
+    header("Location: admin_dashboard.php");
+    exit();
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Get form input
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    // Connect to database
+    $conn = new mysqli("localhost", "root", "425096", "users");
+
+    // Check connection
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    // Query to check email and password
+    $stmt = $conn->prepare("SELECT * FROM info WHERE email = ? AND password = ?");
+    $stmt->bind_param("ss", $email, $password); // Bind parameters (email and password)
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // Check if admin exists
+    if ($result->num_rows > 0) {
+        // Fetch admin data and store in session
+        $admin = $result->fetch_assoc();
+        $_SESSION['email'] = $admin['email'];  // Store admin email in session
+
+        // Redirect to dashboard
+        header("Location: admin_dashboard.php");
+        exit();
+    } else {
+        $error_message = "Invalid email or password!";
+    }
+
+    $conn->close();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -64,7 +108,15 @@
 <body>
     <div class="login-container">
         <h2>Admin Login</h2>
-        <form action="admin_auth.php" method="POST">
+
+        <!-- Display error message if credentials are incorrect -->
+        <?php if (isset($error_message)): ?>
+            <div class="alert alert-danger">
+                <?php echo $error_message; ?>
+            </div>
+        <?php endif; ?>
+
+        <form action="admin_login.php" method="POST">
             <div class="mb-3">
                 <input type="email" name="email" class="form-control" placeholder="Email" required>
             </div>

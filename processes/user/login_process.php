@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['email'] = $user['Email'];
 
             // Redirect to dashboard
-            header("Location: dashboard.php");
+            header("Location: user_dashboard.php");
             exit;
         } else {
             echo "<script>alert('Invalid email or password!'); window.location.href='login.php';</script>";
