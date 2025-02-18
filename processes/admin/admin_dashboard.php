@@ -16,6 +16,39 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Fetch Monthly Transaction Data
+$monthlyTransactionQuery = $conn->query("
+    SELECT DATE_FORMAT(transaction_date, '%b') AS month, SUM(amount) AS total
+    FROM transactions
+    GROUP BY DATE_FORMAT(transaction_date, '%Y-%m')
+    ORDER BY MIN(transaction_date)
+");
+
+// Prepare data for Chart.js
+$months = [];
+$totals = [];
+while ($row = $monthlyTransactionQuery->fetch_assoc()) {
+    $months[] = $row['month'];  // Month name (e.g., Jan, Feb)
+    $totals[] = $row['total'];  // Total amount
+}
+
+// Convert to JSON for JavaScript
+$monthsJson = json_encode($months);
+$totalsJson = json_encode($totals);
+
+
+// Fetch Total Properties
+$totalPropertiesQuery = $conn->query("SELECT COUNT(*) AS total FROM properties");
+$totalProperties = $totalPropertiesQuery->fetch_assoc()['total'];
+
+// Fetch Total Transactions
+$totalTransactionsQuery = $conn->query("SELECT COUNT(*) AS total FROM transactions");
+$totalTransactions = $totalTransactionsQuery->fetch_assoc()['total'];
+
+// Fetch Total Transaction Amount
+$totalTransactionAmountQuery = $conn->query("SELECT SUM(amount) AS total FROM transactions");
+$totalTransactionAmount = $totalTransactionAmountQuery->fetch_assoc()['total'];
+
 // Fetch Properties
 $properties = $conn->query("SELECT property_id, property_name, location, price, status, created_at FROM properties");
 
@@ -79,10 +112,15 @@ $conn->close();
             padding: 20px;
         }
         .card {
+             text-align: center;
+             font-size: 18px;
+             font-weight: bold;
+             background: #ffffff;
+             border-radius: 10px;
             box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-            background-color: white;
-            color: black;
+            padding: 20px;
         }
+
     </style>
 </head>
 <body>
@@ -96,6 +134,32 @@ $conn->close();
 
 <div class="content">
     <h2>Admin Dashboard</h2>
+
+    <div class="row">
+    <!-- Total Properties -->
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h4>Total Properties</h4>
+            <h2><?php echo $totalProperties; ?></h2>
+        </div>
+    </div>
+
+    <!-- Total Transactions -->
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h4>Total Transactions</h4>
+            <h2><?php echo $totalTransactions; ?></h2>
+        </div>
+    </div>
+
+    <!-- Total Transaction Amount -->
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h4>Total Amount Transacted</h4>
+            <h2>$<?php echo number_format($totalTransactionAmount, 2); ?></h2>
+        </div>
+    </div>
+</div>
 
     <!-- Properties Table -->
     <div id="properties">
@@ -191,19 +255,28 @@ $conn->close();
     </div>
 </div>
 
-<script>
+   <script>
     const ctx = document.getElementById('transactionChart').getContext('2d');
-    new Chart(ctx, {
+
+    const transactionChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            labels: <?php echo $monthsJson; ?>, // Months from PHP
             datasets: [{
                 label: 'Transaction Flow',
-                data: [1200, 1500, 1100, 1900, 2500, 2200],
+                data: <?php echo $totalsJson; ?>, // Transaction totals from PHP
                 borderColor: 'black',
                 borderWidth: 2,
                 fill: false
             }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
         }
     });
 </script>
