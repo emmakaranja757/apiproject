@@ -124,13 +124,7 @@ $conn->close();
     </style>
 </head>
 <body>
-<div class="sidebar">
-    <a href="#overview">Dashboard</a>
-    <a href="#transactions">Transactions</a>
-    <a href="#payments">Payments</a>
-    <a href="#properties">Properties</a>
-    <a href="admin_logout.php">Logout</a> <!-- Added Logout Link -->
-</div>
+    <?php include('layout/sidebar.php'); ?>
 
 <div class="content">
     <h2>Admin Dashboard</h2>
