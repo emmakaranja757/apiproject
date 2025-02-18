@@ -156,7 +156,7 @@ $conn->close();
     <div class="col-md-4">
         <div class="card p-3">
             <h4>Total Amount Transacted</h4>
-            <h2>$<?php echo number_format($totalTransactionAmount, 2); ?></h2>
+            <h2>Ksh<?php echo number_format($totalTransactionAmount, 2); ?></h2>
         </div>
     </div>
 </div>
@@ -181,7 +181,7 @@ $conn->close();
                         <td><?php echo $row['property_id']; ?></td>
                         <td><?php echo $row['property_name']; ?></td>
                         <td><?php echo $row['location']; ?></td>
-                        <td>$<?php echo number_format($row['price'], 2); ?></td>
+                        <td>Ksh<?php echo number_format($row['price'], 2); ?></td>
                         <td><?php echo $row['status']; ?></td>
                         <td><?php echo $row['created_at']; ?></td>
                     </tr>
@@ -211,7 +211,7 @@ $conn->close();
                         <td><?php echo $row['payment_id']; ?></td>
                         <td><?php echo $row['payer']; ?></td>
                         <td><?php echo $row['transaction_id']; ?></td>
-                        <td>$<?php echo number_format($row['amount'], 2); ?></td>
+                        <td>Ksh<?php echo number_format($row['amount'], 2); ?></td>
                         <td><?php echo $row['payment_method']; ?></td>
                         <td><?php echo $row['status']; ?></td>
                         <td><?php echo $row['payment_date']; ?></td>
@@ -240,7 +240,7 @@ $conn->close();
                         <td><?php echo $row['transaction_id']; ?></td>
                         <td><?php echo $row['property_name']; ?></td>
                         <td><?php echo $row['buyer']; ?></td>
-                        <td>$<?php echo number_format($row['amount'], 2); ?></td>
+                        <td>Ksh<?php echo number_format($row['amount'], 2); ?></td>
                         <td><?php echo $row['transaction_date']; ?></td>
                     </tr>
                 <?php endwhile; ?>
