@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ALL);
 include '../../Dbconn/db_connection.php';
 
 // Establish database connection
@@ -30,6 +31,7 @@ if (!$conn) {
             padding: 20px;
             border-radius: 10px;
             box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative; /* Ensures the dropdown stays inside */
         }
         .btn-custom {
             background-color: #ffcc00;
@@ -58,14 +60,23 @@ if (!$conn) {
         .sidebar a:hover {
             background: #495057;
         }
+        /* 🔹 Fix Dropdown Position */
+        .search-container {
+            position: relative;
+        }
         #searchResults {
             display: none;
             position: absolute;
+            top: 100%;
+            left: 0;
             width: 100%;
             max-height: 200px;
             overflow-y: auto;
             background: white;
             border: 1px solid #ccc;
+            z-index: 1000;
+            border-radius: 5px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
         }
         .search-item {
             padding: 10px;
@@ -86,17 +97,19 @@ if (!$conn) {
     <div class="form-container">
         <h3>Search Property</h3>
         <form method="POST">
-            <div class="mb-3">
+            <div class="mb-3 search-container">
                 <label for="searchProperty" class="form-label">Enter Property Name, Location, or Price</label>
-                <input type="text" class="form-control" id="searchProperty" name="search_property" required>
+                <input type="text" class="form-control" id="searchProperty" name="search_property" autocomplete="off" required>
+                <div id="searchResults" class="dropdown-menu"></div> <!-- 🔹 Dropdown placed inside search-container -->
             </div>
             <button type="submit" class="btn btn-custom">Search</button>
         </form>
-        <div id="searchResults" class="dropdown-menu"></div>
     </div>
 </div>
 
-<script src="layouts&others/Asearch.js"></script>
+<!-- jQuery & AJAX Script -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="layout&others/Asearch.js"></script>
 
 </body>
 </html>

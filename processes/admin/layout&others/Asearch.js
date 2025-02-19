@@ -1,32 +1,39 @@
 $(document).ready(function () {
     $('#searchProperty').on('input', function () {
         let query = $(this).val().trim();
+        let resultsContainer = $('#searchResults');
+
         if (query.length > 0) {
             $.ajax({
-                url: 'search_property.php',
+                url: 'layout&others/Ajax.php', // Correct path
                 method: 'GET',
                 data: { query: query },
+                dataType: 'json', // Ensure JSON response
                 success: function (response) {
-                    let results = JSON.parse(response);
-                    let resultsContainer = $('#searchResults');
+                    console.log("AJAX Response:", response); // Debugging
                     resultsContainer.empty().show();
-                    
-                    if (results.length === 0) {
+
+                    if (response.length === 0) {
                         resultsContainer.append('<p class="search-item">No results found</p>');
                     } else {
-                        results.forEach(function (property) {
-                            let item = $('<div class="search-item"></div>').text(property.property_name + ' - ' + property.location + ' - $' + property.price);
-                            item.on('click', function () {
-                                $('#searchProperty').val(property.property_name);
-                                resultsContainer.hide();
-                            });
+                        response.forEach(function (property) {
+                            let item = $('<div class="search-item"></div>')
+                                .text(property.property_name + ' - ' + property.location + ' - $' + property.price)
+                                .on('click', function () {
+                                    $('#searchProperty').val(property.property_name);
+                                    resultsContainer.hide();
+                                });
                             resultsContainer.append(item);
                         });
                     }
+                },
+                error: function (xhr, status, error) {
+                    console.error("AJAX Error:", error);
+                    console.log("Full Response:", xhr.responseText); // Debugging
                 }
             });
         } else {
-            $('#searchResults').hide();
+            resultsContainer.hide();
         }
     });
 

@@ -1,31 +1,43 @@
 <?php
-include '../../Dbconn/db_connection.php';
+// Correct database connection path
+include '../../../Dbconn/db_connection.php';
 
-header("Content-Type: application/json");
+header('Content-Type: application/json');
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 $conn = getDatabaseConnection();
 if (!$conn) {
-    echo json_encode([]);
-    exit();
+    echo json_encode(["error" => "Database connection failed"]);
+    exit;
 }
 
-$query = isset($_GET['query']) ? trim($_GET['query']) : "";
-if ($query === "") {
+// Ensure 'query' parameter is received
+if (isset($_GET['query']) && !empty($_GET['query'])) {
+    $query = trim($_GET['query']);
+
+    try {
+        // Prepare the query using PDO
+        $stmt = $conn->prepare("SELECT property_name, location, price FROM properties 
+                                WHERE property_name LIKE :query 
+                                OR location LIKE :query 
+                                OR CAST(price AS CHAR) LIKE :query 
+                                LIMIT 10");
+
+        // Bind parameters safely
+        $searchTerm = "%$query%";
+        $stmt->bindParam(':query', $searchTerm, PDO::PARAM_STR);
+        $stmt->execute();
+
+        // Fetch results as an associative array
+        $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Output JSON response
+        echo json_encode($properties);
+    } catch (PDOException $e) {
+        echo json_encode(["error" => "SQL Error: " . $e->getMessage()]);
+    }
+} else {
     echo json_encode([]);
-    exit();
 }
-
-$sql = "SELECT property_id, property_name, location, price 
-        FROM properties 
-        WHERE property_name LIKE :query 
-        OR location LIKE :query 
-        OR price LIKE :query 
-        LIMIT 5";
-
-$stmt = $conn->prepare($sql);
-$stmt->bindValue(":query", "%$query%");
-$stmt->execute();
-$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-echo json_encode($results);
 ?>

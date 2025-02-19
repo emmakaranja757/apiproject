@@ -124,7 +124,7 @@ $conn->close();
     </style>
 </head>
 <body>
-    <?php include('layout/sidebar.php'); ?>
+    <?php include('layout&others/sidebar.php'); ?>
 
 <div class="content">
     <h2>Admin Dashboard</h2>
