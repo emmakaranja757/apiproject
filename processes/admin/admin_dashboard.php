@@ -182,9 +182,9 @@ $conn->close();
                 <?php endwhile; ?>
             </tbody>
         </table>
-        <button class="btn btn-primary" onclick="location.href='add_property.php'">Add Property</button>
+        <button class="btn btn-secondary" onclick="location.href='add_property.php'">Add Property</button>
 <button class="btn btn-secondary" onclick="location.href='edit_property.php'">Edit Property</button>
-<button class ="btn btn-primary" onclick="location.href='delete_property.php'">Detele Property</button>
+<button class ="btn btn-secondary" onclick="location.href='delete_property.php'">Detele Property</button>
     </div>
 
     <!-- Payments Table -->
