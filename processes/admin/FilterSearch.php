@@ -1,12 +1,23 @@
 <?php
-error_reporting(E_ALL);
+session_start();
 include '../../Dbconn/db_connection.php';
 
-// Establish database connection
 $conn = getDatabaseConnection();
 if (!$conn) {
     die("Database connection failed.");
 }
+
+// Capture the property_id from the URL and store it in session
+if (isset($_GET['property_id'])) {
+    $_SESSION['property_id'] = $_GET['property_id'];
+}
+
+// Redirect to edit_property.php
+if (isset($_SESSION['property_id'])) {
+    header("Location: edit_property.php");
+    exit;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -102,7 +113,7 @@ if (!$conn) {
                 <input type="text" class="form-control" id="searchProperty" name="search_property" autocomplete="off" required>
                 <div id="searchResults" class="dropdown-menu"></div> <!-- 🔹 Dropdown placed inside search-container -->
             </div>
-            <button type="submit" class="btn btn-custom">Search</button>
+            <button type="submit" onclick=""class="btn btn-custom">Search</button>
         </form>
     </div>
 </div>

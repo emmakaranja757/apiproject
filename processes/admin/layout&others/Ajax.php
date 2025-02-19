@@ -18,7 +18,7 @@ if (isset($_GET['query']) && !empty($_GET['query'])) {
 
     try {
         // Prepare the query using PDO
-        $stmt = $conn->prepare("SELECT property_name, location, price FROM properties 
+        $stmt = $conn->prepare("SELECT property_id, property_name, location, price FROM properties 
                                 WHERE property_name LIKE :query 
                                 OR location LIKE :query 
                                 OR CAST(price AS CHAR) LIKE :query 
@@ -34,10 +34,13 @@ if (isset($_GET['query']) && !empty($_GET['query'])) {
 
         // Output JSON response
         echo json_encode($properties);
+        exit; // ⬅️ Prevent duplicate JSON output
     } catch (PDOException $e) {
         echo json_encode(["error" => "SQL Error: " . $e->getMessage()]);
+        exit;
     }
 } else {
     echo json_encode([]);
+    exit;
 }
 ?>

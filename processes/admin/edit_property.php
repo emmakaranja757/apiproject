@@ -1,5 +1,35 @@
 <?php
 include('Crude.php');
+
+
+include '../../Dbconn/db_connection.php';
+
+$conn = getDatabaseConnection();
+if (!$conn) {
+    die("Database connection failed.");
+}
+
+// Retrieve the property_id from session
+if (!isset($_SESSION['property_id'])) {
+    die("No property selected.");
+}
+
+$property_id = $_SESSION['property_id'];
+
+// Fetch property details from the database
+$stmt = $conn->prepare("SELECT * FROM properties WHERE property_id = :property_id");
+$stmt->bindParam(':property_id', $property_id, PDO::PARAM_INT);
+$stmt->execute();
+$property = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$property) {
+    die("Property not found.");
+}
+
+// Display property details for editing
+echo "<h2>Edit Property: " . htmlspecialchars($property['property_name']) . "</h2>";
+?>
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -55,5 +85,33 @@ include('Crude.php');
 </head>
 <body>
     <?php include('layout&others/sidebar.php'); ?>
+    
+    <div class="container mt-4">
+        <h2>Property List</h2>
+        <?php displayProperties(); ?>
+        <h2 class="mt-4">Update Property</h2>
+        <form method="POST">
+            <div class="mb-3">
+                <label for="property_id" class="form-label">Property ID</label>
+                <input type="number" name="property_id" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="column" class="form-label">Column to Update</label>
+                <select name="column" class="form-control" required>
+                    <option value="property_name">Property Name</option>
+                    <option value="location">Location</option>
+                    <option value="price">Price</option>
+                    <option value="status">Status</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="new_value" class="form-label">New Value</label>
+                <input type="text" name="new_value" class="form-control" required>
+            </div>
+            <button type="submit" onclick="<?php updateProperty()?>"class="btn btn-primary">Update Property</button>
+        </form>
+    </div>
+
+
     </body>
     </html>

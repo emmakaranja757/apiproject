@@ -5,12 +5,11 @@ $(document).ready(function () {
 
         if (query.length > 0) {
             $.ajax({
-                url: 'layout&others/Ajax.php', // Correct path
+                url: 'layout&others/Ajax.php',
                 method: 'GET',
                 data: { query: query },
-                dataType: 'json', // Ensure JSON response
+                dataType: 'json',
                 success: function (response) {
-                    console.log("AJAX Response:", response); // Debugging
                     resultsContainer.empty().show();
 
                     if (response.length === 0) {
@@ -22,6 +21,9 @@ $(document).ready(function () {
                                 .on('click', function () {
                                     $('#searchProperty').val(property.property_name);
                                     resultsContainer.hide();
+
+                                    // Send property_id to FilterSearch.php via URL
+                                    window.location.href = 'FilterSearch.php?property_id=' + property.property_id;
                                 });
                             resultsContainer.append(item);
                         });
@@ -29,7 +31,7 @@ $(document).ready(function () {
                 },
                 error: function (xhr, status, error) {
                     console.error("AJAX Error:", error);
-                    console.log("Full Response:", xhr.responseText); // Debugging
+                    console.log("Full Response:", xhr.responseText);
                 }
             });
         } else {
