@@ -79,7 +79,7 @@ if (!$conn) {
 </head>
 <body>
 
-<?php include('layout/sidebar.php'); ?>
+<?php include('layout&others/sidebar.php'); ?>
 
 <!-- Content Area -->
 <div class="content">
@@ -96,7 +96,7 @@ if (!$conn) {
     </div>
 </div>
 
-
+<script src="layouts&others/Asearch.js"></script>
 
 </body>
 </html>
