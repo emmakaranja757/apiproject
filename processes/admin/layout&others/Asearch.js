@@ -1,31 +1,38 @@
-<?php
-include '../../Dbconn/db_connection.php';
+$(document).ready(function () {
+    $('#searchProperty').on('input', function () {
+        let query = $(this).val().trim();
+        if (query.length > 0) {
+            $.ajax({
+                url: 'search_property.php',
+                method: 'GET',
+                data: { query: query },
+                success: function (response) {
+                    let results = JSON.parse(response);
+                    let resultsContainer = $('#searchResults');
+                    resultsContainer.empty().show();
+                    
+                    if (results.length === 0) {
+                        resultsContainer.append('<p class="search-item">No results found</p>');
+                    } else {
+                        results.forEach(function (property) {
+                            let item = $('<div class="search-item"></div>').text(property.property_name + ' - ' + property.location + ' - $' + property.price);
+                            item.on('click', function () {
+                                $('#searchProperty').val(property.property_name);
+                                resultsContainer.hide();
+                            });
+                            resultsContainer.append(item);
+                        });
+                    }
+                }
+            });
+        } else {
+            $('#searchResults').hide();
+        }
+    });
 
-header("Content-Type: application/json");
-
-$conn = getDatabaseConnection();
-if (!$conn) {
-    echo json_encode([]);
-    exit();
-}
-
-$query = isset($_GET['query']) ? trim($_GET['query']) : "";
-if ($query === "") {
-    echo json_encode([]);
-    exit();
-}
-
-$sql = "SELECT property_id, property_name, location, price 
-        FROM properties 
-        WHERE property_name LIKE :query 
-        OR location LIKE :query 
-        OR price LIKE :query 
-        LIMIT 5";
-
-$stmt = $conn->prepare($sql);
-$stmt->bindValue(":query", "%$query%");
-$stmt->execute();
-$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-echo json_encode($results);
-?>
+    $(document).click(function (event) {
+        if (!$(event.target).closest('#searchProperty, #searchResults').length) {
+            $('#searchResults').hide();
+        }
+    });
+});
