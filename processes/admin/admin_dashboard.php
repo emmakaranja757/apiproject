@@ -182,6 +182,7 @@ $conn->close();
                 <?php endwhile; ?>
             </tbody>
         </table>
+        <button a href="add_property.php">Add Property</button>
     </div>
 
     <!-- Payments Table -->
