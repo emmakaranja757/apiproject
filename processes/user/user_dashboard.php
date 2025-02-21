@@ -11,8 +11,8 @@ if (!isset($_SESSION['email'])) {
 $pdo = getDatabaseConnection();
 $email = $_SESSION['email'];
 
-// Fetch user_id from the database
-$stmt = $pdo->prepare("SELECT info_id FROM info WHERE Email = :email");
+// Fetch user_id and fullname from the database
+$stmt = $pdo->prepare("SELECT info_id, fullname FROM info WHERE Email = :email");
 $stmt->bindParam(':email', $email, PDO::PARAM_STR);
 $stmt->execute();
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -22,6 +22,7 @@ if (!$user) {
 }
 
 $userId = $user['info_id']; // Now we have user_id
+$name = $user['fullname'];  // Assign fullname to $name
 
 // Fetch user's total properties (member shares)
 $stmt = $pdo->prepare("SELECT COUNT(*) AS total_shares FROM properties WHERE info_id = :info_id");
@@ -46,6 +47,7 @@ $stmt->bindParam(':info_id', $userId, PDO::PARAM_INT);
 $stmt->execute();
 $totalSpent = $stmt->fetch(PDO::FETCH_ASSOC)['total_spent'] ?? 0;
 
+// Fetch transaction history
 $stmt = $pdo->prepare("
     SELECT t.amount, p.payment_date, 'Transaction' AS description 
     FROM transactions t
@@ -68,8 +70,8 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body>
     <div class="container mt-4">
-        <h2>Welcome, <?php echo $_SESSION['fullname']; ?></h2>
-        
+        <h2>Welcome, <?php echo htmlspecialchars($name); ?></h2>
+
         <div class="row">
             <div class="col-md-4">
                 <div class="card">
