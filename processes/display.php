@@ -75,10 +75,10 @@
           <a class="nav-link text-white" href="#pricing">Pricing</a>
         </li>
         <li class="nav-item">
-     <a class="nav-link text-white" href="users/register.php">Sign Up</a>
+     <a class="nav-link text-white" href="user/register.php">Sign Up</a>
       </li>
     <li class="nav-item">
-      <a class="nav-link text-white" href="users/login.php">Log In</a>
+      <a class="nav-link text-white" href="user/login.php">Log In</a>
      </li>
       </ul>
     </div>

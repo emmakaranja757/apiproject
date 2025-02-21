@@ -1,6 +1,6 @@
 <?php
 session_start();
-require '../Dbconn/db_connection.php'; // Include the database connection
+require '../../Dbconn/db_connection.php'; // Include the database connection
 
 if (!isset($_SESSION['email'])) {
     header("Location: login.php");
@@ -9,29 +9,51 @@ if (!isset($_SESSION['email'])) {
 
 // Get database connection
 $pdo = getDatabaseConnection();
-$userId = $_SESSION['user_id'];
+$email = $_SESSION['email'];
 
-// Fetch user's total properties
-$stmt = $pdo->prepare("SELECT COUNT(*) AS total_shares FROM properties WHERE user_id = :user_id");
-$stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+// Fetch user_id from the database
+$stmt = $pdo->prepare("SELECT info_id FROM info WHERE Email = :email");
+$stmt->bindParam(':email', $email, PDO::PARAM_STR);
+$stmt->execute();
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$user) {
+    die("User not found.");
+}
+
+$userId = $user['info_id']; // Now we have user_id
+
+// Fetch user's total properties (member shares)
+$stmt = $pdo->prepare("SELECT COUNT(*) AS total_shares FROM properties WHERE info_id = :info_id");
+$stmt->bindParam(':info_id', $userId, PDO::PARAM_INT);
 $stmt->execute();
 $totalShares = $stmt->fetch(PDO::FETCH_ASSOC)['total_shares'] ?? 0;
 
 // Fetch pending balance
-$stmt = $pdo->prepare("SELECT SUM(amount) AS pending_balance FROM transactions WHERE user_id = :user_id AND status = 'pending'");
-$stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+$stmt = $pdo->prepare("SELECT SUM(amount) AS balance FROM transactions WHERE info_id = :info_id");
+$stmt->bindParam(':info_id', $userId, PDO::PARAM_INT);
 $stmt->execute();
-$pendingBalance = $stmt->fetch(PDO::FETCH_ASSOC)['pending_balance'] ?? 0;
+$pendingBalance = $stmt->fetch(PDO::FETCH_ASSOC)['balance'] ?? 0;
 
-// Fetch total amount spent
-$stmt = $pdo->prepare("SELECT SUM(amount) AS total_spent FROM transactions WHERE user_id = :user_id AND status = 'completed'");
-$stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+// Fetch total amount spent with JOIN fix
+$stmt = $pdo->prepare("
+    SELECT SUM(t.amount) AS total_spent 
+    FROM transactions t
+    JOIN payments p ON t.transaction_id = p.transaction_id
+    WHERE t.info_id = :info_id AND p.status = 'completed'
+");
+$stmt->bindParam(':info_id', $userId, PDO::PARAM_INT);
 $stmt->execute();
 $totalSpent = $stmt->fetch(PDO::FETCH_ASSOC)['total_spent'] ?? 0;
 
-// Fetch transaction history
-$stmt = $pdo->prepare("SELECT amount, payment_date, description FROM transactions WHERE user_id = :user_id ORDER BY payment_date DESC");
-$stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+$stmt = $pdo->prepare("
+    SELECT t.amount, p.payment_date, 'Transaction' AS description 
+    FROM transactions t
+    LEFT JOIN payments p ON t.transaction_id = p.transaction_id
+    WHERE t.info_id = :info_id 
+    ORDER BY p.payment_date DESC
+");
+$stmt->bindParam(':info_id', $userId, PDO::PARAM_INT);
 $stmt->execute();
 $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
