@@ -1,6 +1,6 @@
 <?php
 session_start();
-require '../Dbconn/db_connection.php'; // Ensure this file contains the function getDatabaseConnection()
+require '../../Dbconn/db_connection.php'; // Ensure this file contains the function getDatabaseConnection()
 
 $pdo = getDatabaseConnection(); // Call the function to get the PDO connection
 
@@ -88,7 +88,7 @@ if (isset($_POST['register'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background: url('../IMAGES/background.jpeg') no-repeat center center fixed;
+            background: url('/apiproject/IMAGES/background.jpeg') no-repeat center center fixed;
             background-size: cover;
             color: white;
             height: 100vh;
