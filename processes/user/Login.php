@@ -10,7 +10,7 @@
     <style>
         /* Background Image with Blur */
         body {
-            background: url('../IMAGES/background.jpeg') no-repeat center center fixed;
+            background: url('/apiproject/IMAGES/background.jpeg') no-repeat center center fixed;
             background-size: cover;
             position: relative;
         }

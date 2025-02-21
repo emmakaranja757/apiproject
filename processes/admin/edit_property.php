@@ -1,7 +1,7 @@
 <?php
-include('Crude.php');
-
-
+echo "<prev>";
+print_r($_SESSION);
+echo"</prev>";
 include '../../Dbconn/db_connection.php';
 
 $conn = getDatabaseConnection();
@@ -28,6 +28,8 @@ if (!$property) {
 
 // Display property details for editing
 echo "<h2>Edit Property: " . htmlspecialchars($property['property_name']) . "</h2>";
+
+include('Crude.php');
 ?>
 
 ?>

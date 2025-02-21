@@ -7,7 +7,7 @@ $pdo = getDatabaseConnection(); // Ensure this function returns a valid PDO obje
 
 // If already logged in, redirect to admin dashboard
 if (isset($_SESSION['email'])) {
-    header("Location: admin_dashboard.php");
+    header("Location:../processes/admin/admin_dashboard.php");
     exit();
 }
 

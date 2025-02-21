@@ -55,8 +55,8 @@
           <a class="nav-link text-white" aria-current="page" href="#">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white" href="admin_login.php">Admin</a>
-         </li>
+        <a class="nav-link text-white" href="admin/admin_login.php">Admin</a>
+       </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle text-white" href="#" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             About Us
@@ -75,11 +75,11 @@
           <a class="nav-link text-white" href="#pricing">Pricing</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white" href="register.php">Sign Up</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white" href="login.php">Log In</a>
-        </li>
+     <a class="nav-link text-white" href="users/register.php">Sign Up</a>
+      </li>
+    <li class="nav-item">
+      <a class="nav-link text-white" href="users/login.php">Log In</a>
+     </li>
       </ul>
     </div>
   </div>
