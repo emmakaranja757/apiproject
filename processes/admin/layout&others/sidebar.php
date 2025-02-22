@@ -2,7 +2,7 @@
 echo'<div class="sidebar">
     <a href="admin_dashboard.php">Dashboard</a>
     <a href="transactions.php">Transactions</a>
-    <a href="#payments">Payments</a>
+    <a href="payments.php">Payments</a>
     <a href="properties.php">Properties</a>
     <a href="add_property.php">Add property</a>
     <a href="edit_property.php">Edit property</a>
