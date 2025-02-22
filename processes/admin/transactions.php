@@ -11,17 +11,13 @@ if (!isset($_SESSION['email'])) {
 // Get database connection
 $conn = getDatabaseConnection();
 
-// Fetch Transactions
-$sql = "
-    SELECT t.transaction_id, p.property_name, i.fullname AS buyer, t.amount, t.transaction_date
-    FROM transactions t
-    JOIN properties p ON t.property_id = p.property_id
-    JOIN info i ON t.info_id = i.info_id
-    ORDER BY t.transaction_date DESC
-";
-$stmt = $conn->prepare($sql);
-$stmt->execute();
-$transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Fetch transactions from the database
+$sql = "SELECT t.transaction_id, p.property_name, i.fullname AS buyer, t.amount, t.transaction_date
+        FROM transactions t
+        JOIN properties p ON t.property_id = p.property_id
+        JOIN info i ON t.info_id = i.info_id
+        ORDER BY t.transaction_date DESC";
+$result = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
@@ -30,17 +26,48 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transactions</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Include your CSS file -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn-back {
+            margin-bottom: 15px;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 2px solid #000;
+            text-align: left;
+        }
+        .table-dark {
+            background-color: #343a40;
+            color: white;
+        }
+    </style>
 </head>
 <body>
 
-<div class="main-content">
-    <h2>Transactions</h2>
+<div class="container">
+    <button class="btn btn-dark btn-back" onclick="location.href='admin_dashboard.php'">Back to Dashboard</button>
     
-    <table border="1">
-        <thead>
+    <h2>Transactions</h2>
+    <table class="table table-bordered">
+        <thead class="table-dark">
             <tr>
-                <th>Transaction ID</th>
+                <th>ID</th>
                 <th>Property</th>
                 <th>Buyer</th>
                 <th>Amount</th>
@@ -48,8 +75,9 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </tr>
         </thead>
         <tbody>
-            <?php if (!empty($transactions)) {
-                foreach ($transactions as $row) {
+            <?php
+            if ($result->rowCount() > 0) {
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                     echo "<tr>
                         <td>{$row['transaction_id']}</td>
                         <td>{$row['property_name']}</td>
@@ -64,48 +92,7 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
             ?>
         </tbody>
     </table>
-
-    <!-- Back Button -->
-    <button onclick="window.location.href='admin_dashboard.php'" class="back-btn">Back</button>
 </div>
-
-<style>
-    .main-content {
-        margin-left: 220px; /* Adjust for sidebar */
-        padding: 20px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-    }
-
-    th, td {
-        padding: 10px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-    }
-
-    th {
-        background-color: #f4f4f4;
-    }
-
-    .back-btn {
-        margin-top: 20px;
-        padding: 10px 20px;
-        font-size: 16px;
-        background-color: #333;
-        color: #fff;
-        border: none;
-        cursor: pointer;
-        border-radius: 5px;
-    }
-
-    .back-btn:hover {
-        background-color: #555;
-    }
-</style>
 
 </body>
 </html>
