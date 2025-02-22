@@ -94,15 +94,10 @@ $conn->close();
             padding: 10px;
         }
         .toggle-button {
-            background: #343a40;
-            color: white;
+            background: none;
             border: none;
-            padding: 10px 20px;
+            font-size: 24px;
             cursor: pointer;
-            border-radius: 5px;
-        }
-        .toggle-button:hover {
-            background: #495057;
         }
     </style>
 </head>
@@ -111,7 +106,7 @@ $conn->close();
 
     <div class="content">
         <div class="toggle-container">
-            <button class="toggle-button" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+            <button class="toggle-button" onclick="toggleDarkMode()">🌙</button>
         </div>
         <h2>Admin Dashboard</h2>
 
@@ -166,6 +161,12 @@ $conn->close();
 
         function toggleDarkMode() {
             document.body.classList.toggle("dark-mode");
+            const button = document.querySelector(".toggle-button");
+            if (document.body.classList.contains("dark-mode")) {
+                button.textContent = "☀️";
+            } else {
+                button.textContent = "🌙";
+            }
         }
     </script>
 </body>
