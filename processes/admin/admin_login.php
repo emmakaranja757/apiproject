@@ -7,7 +7,7 @@ $pdo = getDatabaseConnection(); // Ensure this function returns a valid PDO obje
 
 // If already logged in, redirect to admin dashboard
 if (isset($_SESSION['email'])) {
-    header("Location:../processes/admin/admin_dashboard.php");
+    header("Location:admin_dashboard.php");
     exit();
 }
 
@@ -39,7 +39,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,66 +47,82 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>Admin Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Background Blur Effect */
         body {
             background: url('../../IMAGES/background.jpeg') no-repeat center center fixed;
             background-size: cover;
-            position: relative;
-        }
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4); /* Dark overlay */
-            backdrop-filter: blur(8px); /* Blurred effect */
-            z-index: -1;
+            transition: background-color 0.3s ease;
         }
         
-        /* Login Container */
         .login-container {
             width: 400px;
             margin: 100px auto;
             padding: 25px;
             border: 2px solid #000;
-            background: rgba(255, 255, 255, 0.85); /* Slightly transparent */
+            background: rgba(255, 255, 255, 0.85);
             border-radius: 10px;
             text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
         }
-
+        
         h2 {
-            font-weight: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
         }
-
-        .form-control {
-            font-weight: 500; /* Slightly bold */
-        }
-
+        
         .btn-primary {
-            font-weight: none;
+            transition: all 0.3s ease;
         }
-
-        /* Forgot Password */
+        .btn-primary:hover {
+            transform: scale(1.05);
+        }
+        
         .forgot-password {
             display: block;
             margin-top: 10px;
             text-decoration: none;
-            font-weight: none;
             color: #007bff;
+            transition: color 0.3s ease;
         }
-
         .forgot-password:hover {
-            text-decoration: underline;
+            color: #0056b3;
+        }
+        
+        /* Dark Mode */
+        .dark-mode {
+            background-color: #121212;
+            color: #fff;
+        }
+        .dark-mode .login-container {
+            background: rgba(30, 30, 30, 0.9);
+            border-color: #fff;
+        }
+        .dark-mode h2 {
+            color: #f8f9fa;
+        }
+        .dark-mode .forgot-password {
+            color: #bb86fc;
+        }
+        .dark-mode .btn-primary {
+            background-color: #bb86fc;
+            border-color: #bb86fc;
+        }
+        
+        /* Dark Mode Toggle Button */
+        .dark-mode-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 24px;
         }
     </style>
 </head>
 <body>
     <div class="login-container">
+        <span id="darkModeToggle" class="dark-mode-toggle">🌙</span>
         <h2>Admin Login</h2>
 
-        <!-- Display error message if credentials are incorrect -->
         <?php if (isset($error_message)): ?>
             <div class="alert alert-danger">
                 <?php echo $error_message; ?>
@@ -125,5 +140,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <a href="forget_password.php" class="forgot-password">Forgot Password?</a>
         </form>
     </div>
+
+    <script>
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        darkModeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+            darkModeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        });
+
+        // Load dark mode preference
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            darkModeToggle.textContent = '☀️';
+        }
+    </script>
 </body>
 </html>
