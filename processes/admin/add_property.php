@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body>
     <!-- Sidebar -->
     
-    <?php include('layout/sidebar.php'); ?>
+    <?php include('layout&others/sidebar.php'); ?>
     <!-- Content Area -->
     <div class="content">
         <div class="form-container">
