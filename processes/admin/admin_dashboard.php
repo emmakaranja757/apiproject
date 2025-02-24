@@ -1,50 +1,31 @@
 <?php
-// Start the session and check if the admin is logged in
 session_start();
-
-// Check if the admin is logged in
 if (!isset($_SESSION['email'])) {
-    header("Location: admin_login.php"); // Redirect to login page if not logged in
+    header("Location: admin_login.php");
     exit();
 }
 
-// Connect to database
 $conn = new mysqli("localhost", "root", "425096", "users");
-
-// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch Monthly Transaction Data
-$monthlyTransactionQuery = $conn->query("
-    SELECT DATE_FORMAT(transaction_date, '%b') AS month, SUM(amount) AS total
-    FROM transactions
-    GROUP BY DATE_FORMAT(transaction_date, '%Y-%m')
-    ORDER BY MIN(transaction_date)
-");
-
-// Prepare data for Chart.js
+$monthlyTransactionQuery = $conn->query("SELECT DATE_FORMAT(transaction_date, '%b') AS month, SUM(amount) AS total FROM transactions GROUP BY DATE_FORMAT(transaction_date, '%Y-%m') ORDER BY MIN(transaction_date)");
 $months = [];
 $totals = [];
 while ($row = $monthlyTransactionQuery->fetch_assoc()) {
-    $months[] = $row['month'];  // Month name (e.g., Jan, Feb)
-    $totals[] = $row['total'];  // Total amount
+    $months[] = $row['month'];
+    $totals[] = $row['total'];
 }
-
-// Convert to JSON for JavaScript
 $monthsJson = json_encode($months);
 $totalsJson = json_encode($totals);
 
-// Fetch Total Properties
 $totalPropertiesQuery = $conn->query("SELECT COUNT(*) AS total FROM properties");
 $totalProperties = $totalPropertiesQuery->fetch_assoc()['total'];
 
-// Fetch Total Transactions
 $totalTransactionsQuery = $conn->query("SELECT COUNT(*) AS total FROM transactions");
 $totalTransactions = $totalTransactionsQuery->fetch_assoc()['total'];
 
-// Fetch Total Transaction Amount
 $totalTransactionAmountQuery = $conn->query("SELECT SUM(amount) AS total FROM transactions");
 $totalTransactionAmount = $totalTransactionAmountQuery->fetch_assoc()['total'];
 
@@ -60,137 +41,138 @@ $conn->close();
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="styles.css">
     <style>
         body {
-            background-color: #f4f4f4;
-            transition: background 0.3s;
-        }
-        .dark-mode {
-            background-color: #212529;
-            color: white;
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
         }
         .sidebar {
-            width: 250px;
+            width: 200px;
             height: 100vh;
+            background-color: #343a40;
+            color: white;
             position: fixed;
-            background: #343a40;
+            top: 0;
+            left: 0;
             padding-top: 20px;
         }
         .sidebar a {
+            display: block;
             color: white;
             padding: 10px;
-            display: block;
             text-decoration: none;
         }
         .sidebar a:hover {
-            background: #495057;
+            background-color: #495057;
         }
-        .content {
-            margin-left: 260px;
+        .main-content {
+            flex-grow: 1;
             padding: 20px;
+            margin-left: 200px;
         }
-        .card {
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            background: #ffffff;
+        .header {
+            background-color: #fff;
+            padding: 15px;
             border-radius: 10px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .cards .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .analytics {
+            background-color: #fff;
             padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
         }
-        .dark-mode .card {
-            background: #343a40;
+        .dark-mode {
+            background-color: #333;
             color: white;
-        }
-        #darkModeToggle {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-            font-size: 20px;
         }
     </style>
 </head>
 <body>
-    <?php include('layout&others/sidebar.php'); ?>
-
-    <div class="content">
-        <h2>Admin Dashboard</h2>
-        <span id="darkModeToggle">🌙</span>
-        <div class="row">
+    <?php include 'layout&others/sidebar.php'; ?>
+    
+    <div class="main-content">
+        <div class="header d-flex justify-content-between align-items-center">
+            <h2>Overview</h2>
+            <button class="btn btn-dark" id="darkModeToggle">🌙</button>
+        </div>
+        
+        <div class="cards row mt-4">
             <div class="col-md-4">
-                <div class="card p-3">
-                    <h4>Total Properties</h4>
-                    <h2 id="propertyCount">0</h2>
+                <div class="card text-white bg-primary">
+                    <div class="card-body text-center">
+                        <h4>Total Sales</h4>
+                        <h2>$<?php echo number_format($totalTransactionAmount, 2); ?></h2>
+                    </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card p-3">
-                    <h4>Total Transactions</h4>
-                    <h2 id="transactionCount">0</h2>
+                <div class="card text-white bg-success">
+                    <div class="card-body text-center">
+                        <h4>Total Profit</h4>
+                        <h2>$762.10</h2>
+                    </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card p-3">
-                    <h4>Total Amount Transacted</h4>
-                    <h2 id="amountCount">Ksh 0</h2>
+                <div class="card text-white bg-warning">
+                    <div class="card-body text-center">
+                        <h4>Total Orders</h4>
+                        <h2><?php echo $totalTransactions; ?></h2>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="mt-5">
-            <h3>Transaction Flow</h3>
-            <canvas id="transactionChart"></canvas>
+        
+        <div class="analytics mt-4">
+            <h3>Transactions Chart Flow</h3>
+            <canvas id="transactionsChart"></canvas>
         </div>
     </div>
 
     <script>
-        // Dark Mode Persistence
         if (localStorage.getItem("dark-mode") === "enabled") {
             document.body.classList.add("dark-mode");
         }
-
-        function toggleDarkMode() {
+        document.getElementById("darkModeToggle").addEventListener("click", function() {
             document.body.classList.toggle("dark-mode");
             localStorage.setItem("dark-mode", document.body.classList.contains("dark-mode") ? "enabled" : "disabled");
-        }
-        document.getElementById("darkModeToggle").addEventListener("click", toggleDarkMode);
-
-        // Animated Counters
-        function animateCounter(id, target) {
-            let count = 0;
-            const interval = setInterval(() => {
-                count += Math.ceil(target / 50);
-                if (count >= target) {
-                    count = target;
-                    clearInterval(interval);
-                }
-                document.getElementById(id).textContent = count;
-            }, 20);
-        }
-        animateCounter("propertyCount", <?php echo $totalProperties; ?>);
-        animateCounter("transactionCount", <?php echo $totalTransactions; ?>);
-        animateCounter("amountCount", <?php echo $totalTransactionAmount; ?>);
-
-        // Chart.js Line Chart
-        const ctx = document.getElementById('transactionChart').getContext('2d');
-        const transactionChart = new Chart(ctx, {
+        });
+        
+        const ctx = document.getElementById('transactionsChart').getContext('2d');
+        new Chart(ctx, {
             type: 'line',
             data: {
                 labels: <?php echo $monthsJson; ?>,
                 datasets: [{
-                    label: 'Transaction Flow',
+                    label: 'Transactions',
                     data: <?php echo $totalsJson; ?>,
-                    borderColor: 'black',
+                    borderColor: 'green',
                     borderWidth: 2,
-                    fill: false
+                    fill: false,
+                    pointBackgroundColor: 'blue'
                 }]
             },
             options: {
                 responsive: true,
                 scales: {
-                    y: {
-                        beginAtZero: true
+                    y: { beginAtZero: true }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'black',
+                            font: {
+                                size: 14
+                            }
+                        }
                     }
                 }
             }
