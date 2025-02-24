@@ -79,8 +79,10 @@ $conn->close();
     }
 
     .sidebar a:hover {
-        background-color: #495057;
-    }
+    background-color: #0056b3;
+    transition: 0.3s;
+}
+
 
     .logout {
         margin-top: auto;
