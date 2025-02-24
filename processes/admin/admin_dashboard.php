@@ -150,15 +150,19 @@ $conn->close();
         });
 
         new Chart(document.getElementById('userStatsChart'), {
-            type: 'pie',
-            data: {
-                labels: ['Active Users', 'New Signups', 'Total Users'],
-                datasets: [{
-                    data: [<?php echo $activeUsers; ?>, <?php echo $newUsers; ?>, <?php echo $totalUsers; ?>],
-                    backgroundColor: ['#36A2EB', '#FFCE56', '#FF6384']
-                }]
-            }
-        });
+        type: 'pie',
+        data: {
+            labels: ['Active Users', 'New Signups', 'Total Users'],
+            datasets: [{
+                data: [<?php echo $activeUsers; ?>, <?php echo $newUsers; ?>, <?php echo $totalUsers; ?>],
+                backgroundColor: ['#4CAF50', '#FFA726', '#1E88E5'], // New colors: Green, Orange, and Blue
+                hoverBackgroundColor: ['#388E3C', '#FB8C00', '#1565C0'], // Darker shades for hover effect
+                borderColor: '#ffffff',
+                borderWidth: 2
+            }]
+        }
+    });
+
 
         new Chart(document.getElementById('recentTransactionsChart'), {
             type: 'bar',
