@@ -31,11 +31,12 @@ $totalTransactionAmount = $conn->query("SELECT SUM(amount) AS total FROM transac
 $recentTransactions = $conn->query("SELECT transactions.info_id, amount, transaction_date FROM transactions ORDER BY transaction_date DESC LIMIT 5");
 
 // Fetch top properties
+
 $topProperties = $conn->query("
-    SELECT properties.property_id, properties.property_name, COUNT(transactions.transaction_id) AS transactions 
+    SELECT properties.property_name, COUNT(transactions.transaction_id) AS transactions 
     FROM properties 
     JOIN transactions ON properties.property_id = transactions.property_id 
-    GROUP BY properties.property_id, properties.property_name
+    GROUP BY properties.property_id 
     ORDER BY transactions DESC 
     LIMIT 5
 ");
@@ -127,7 +128,7 @@ $conn->close();
                 <h4>Top Properties</h4>
                 <ul>
                     <?php while ($row = $topProperties->fetch_assoc()) {
-                        echo "<li>{$row['name']} - {$row['transactions']} sales</li>";
+                        echo "<li>{$row['property_name']} - {$row['transactions']} sales</li>";
                     } ?>
                 </ul>
             </div>
