@@ -118,14 +118,20 @@ $conn->close();
                 <h4>User Statistics</h4>
                 <canvas id="userStatsChart"></canvas>
             </div>
-            <div class="top-properties">
-                <h4>Top Properties</h4>
-                <ul>
-                    <?php while ($row = $topProperties->fetch_assoc()) {
-                        echo "<li>{$row['property_name']} - {$row['transactions']} sales</li>";
-                    } ?>
-                </ul>
-            </div>
+            <div class="top-properties card mt-4">
+    <div class="card-body">
+        <h4 class="card-title">Top Properties</h4>
+        <ul class="list-group list-group-flush">
+            <?php while ($row = $topProperties->fetch_assoc()) { ?>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <?php echo $row['property_name']; ?>
+                    <span class="badge bg-primary rounded-pill"><?php echo $row['transactions']; ?> sales</span>
+                </li>
+            <?php } ?>
+        </ul>
+    </div>
+</div>
+
             <div class="recent-transactions">
                 <h4>Recent Transactions</h4>
                 <canvas id="recentTransactionsChart"></canvas>
