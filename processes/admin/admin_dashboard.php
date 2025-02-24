@@ -109,34 +109,36 @@ $conn->close();
             <!-- User Statistics (First) -->
             <div class="user-stats">
                 <h4>User Statistics</h4>
-                <p>Total Users: <?php echo $totalUsers; ?></p>
-                <p>Active Users: <?php echo $activeUsers; ?></p>
-                <p>New Signups (30 days): <?php echo $newUsers; ?></p>
+                <canvas id="userStatsChart"></canvas> <!-- Pie Chart -->
+               
             </div>
 
-            <!-- Top Properties (Second) -->
-            <div class="top-properties">
-                <h4>Top Properties</h4>
-                <ul>
-                    <?php while ($row = $topProperties->fetch_assoc()) {
-                        echo "<li>{$row['property_name']} - {$row['transactions']} sales</li>";
-                    } ?>
-                </ul>
-            </div>
+            <!-- Container for Top Properties & Recent Transactions -->
+            <div class="top-transactions-container">
+                <!-- Top Properties (Second) -->
+                <div class="top-properties">
+                    <h4>Top Properties</h4>
+                    <ul>
+                        <?php while ($row = $topProperties->fetch_assoc()) {
+                            echo "<li>{$row['property_name']} - {$row['transactions']} sales</li>";
+                        } ?>
+                    </ul>
+                </div>
 
-            <!-- Recent Transactions (Last) -->
-            <div class="recent-transactions">
-                <h4>Recent Transactions</h4>
-                <ul>
-                    <?php while ($row = $recentTransactions->fetch_assoc()) {
-                        echo "<li>{$row['info_id']} - $" . number_format($row['amount'], 2) . " - {$row['transaction_date']}</li>";
-                    } ?>
-                </ul>
+                <!-- Recent Transactions (Last) -->
+                <div class="recent-transactions">
+                    <h4>Recent Transactions</h4>
+                    <ul>
+                        <?php while ($row = $recentTransactions->fetch_assoc()) {
+                            echo "<li>{$row['info_id']} - $" . number_format($row['amount'], 2) . " - {$row['transaction_date']}</li>";
+                        } ?>
+                    </ul>
+                </div>
             </div>
         </div>
 
-    </div>
     <script>
+        // Transactions Chart
         new Chart(document.getElementById('transactionsChart'), {
             type: 'line',
             data: {
@@ -148,6 +150,18 @@ $conn->close();
                     borderWidth: 2,
                     fill: false,
                     pointBackgroundColor: 'blue'
+                }]
+            }
+        });
+
+        // Pie Chart for User Statistics
+        new Chart(document.getElementById('userStatsChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Active Users', 'New Signups', 'Total Users'],
+                datasets: [{
+                    data: [<?php echo $activeUsers; ?>, <?php echo $newUsers; ?>, <?php echo $totalUsers; ?>],
+                    backgroundColor: ['#36A2EB', '#FFCE56', '#FF6384']
                 }]
             }
         });
