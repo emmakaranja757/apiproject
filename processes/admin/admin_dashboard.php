@@ -58,6 +58,20 @@ $conn->close();
         .card {
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+        .bg-light-blue {
+            background-color: #E0F7FA;
+            color: #007B8F;
+        }
+        .bg-light-green {
+            background-color: #E6F4EA;
+            color: #2E7D32;
+        }
+        .bg-light-purple {
+            background-color: #EDE7F6;
+            color: #5E35B1;
         }
         .analytics, .recent-transactions, .top-properties, .user-stats {
             background-color: #fff;
@@ -76,19 +90,19 @@ $conn->close();
             </div>
             <div class="cards row mt-4">
                 <div class="col-md-4">
-                    <div class="card bg-primary text-white p-3 text-center">
+                    <div class="card bg-light-blue">
                         <h4>Total Sales</h4>
                         <h2>$<?php echo number_format($totalTransactionAmount, 2); ?></h2>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card bg-success text-white p-3 text-center">
+                    <div class="card bg-light-green">
                         <h4>Total Profit</h4>
                         <h2>$762.10</h2>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card bg-warning text-white p-3 text-center">
+                    <div class="card bg-light-purple">
                         <h4>Total Orders</h4>
                         <h2><?php echo $totalTransactions; ?></h2>
                     </div>
