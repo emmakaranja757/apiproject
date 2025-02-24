@@ -9,31 +9,35 @@ if ($conn->connect_error) {
 }
 
 // Fetch user details from "info" table
-$email = $_SESSION['email'];
-$query = $conn->query("SELECT fullname FROM info WHERE Email='$email'");
+$email = $_SESSION['email'] ?? '';
+$query = $conn->query("SELECT fullname, role FROM info WHERE Email='$email'");
 $user = $query->fetch_assoc();
 $fullname = $user['fullname'] ?? 'Admin';
+$role = ucfirst($user['role'] ?? 'Admin'); // Capitalize the role
 
 $conn->close();
 ?>
 
 <div class="sidebar">
     <div class="profile">
-    <img src="/apiproject/IMAGES/profile.jpeg" alt="Profile Picture">
-
+        <img src="/apiproject/IMAGES/profile.jpeg" alt="Profile Picture">
         <p><?php echo htmlspecialchars($fullname); ?></p>
+        <span class="role"><?php echo htmlspecialchars($role); ?></span>
     </div>
+
     <a href="admin_dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
     <a href="transactions.php"><i class="fas fa-exchange-alt"></i> Transactions</a>
     <a href="payments.php"><i class="fas fa-credit-card"></i> Payments</a>
     <a href="properties.php"><i class="fas fa-building"></i> Properties</a>
     <a href="add_property.php"><i class="fas fa-plus-circle"></i> Add Property</a>
     <a href="edit_property.php"><i class="fas fa-edit"></i> Edit Property</a>
-    
+
+    <!-- Logout button at the bottom -->
     <a href="admin_logout.php" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
 </div>
 
 <style>
+    /* Sidebar Styling */
     .sidebar {
         width: 200px;
         height: 100vh;
@@ -41,12 +45,14 @@ $conn->close();
         color: white;
         position: fixed;
         top: 0;
-        left: 0;
+        left: 0; /* Fixing the sidebar to the left */
         padding-top: 20px;
         display: flex;
         flex-direction: column;
+        z-index: 1000; /* Ensuring sidebar stays above content */
     }
 
+    /* Profile Section */
     .profile {
         text-align: center;
         padding: 10px;
@@ -65,6 +71,12 @@ $conn->close();
         font-weight: bold;
     }
 
+    .profile .role {
+        font-size: 12px;
+        color: #ccc;
+    }
+
+    /* Sidebar Links */
     .sidebar a {
         display: flex;
         align-items: center;
@@ -79,11 +91,11 @@ $conn->close();
     }
 
     .sidebar a:hover {
-    background-color: #0056b3;
-    transition: 0.3s;
-}
+        background-color: #0056b3;
+        transition: 0.3s;
+    }
 
-
+    /* Logout Button */
     .logout {
         margin-top: auto;
         text-align: center;
@@ -91,6 +103,12 @@ $conn->close();
 
     .logout:hover {
         background-color: #495057;
+    }
+
+    /* Ensure Main Content Adjusts */
+    .main-content {
+        margin-left: 210px; /* Adjust so content doesn't overlap sidebar */
+        padding: 20px;
     }
 </style>
 
