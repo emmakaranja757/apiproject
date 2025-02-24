@@ -1,4 +1,6 @@
 <?php
+// Start session to store property_id
+
 // Correct database connection path
 include '../../../Dbconn/db_connection.php';
 
@@ -32,9 +34,14 @@ if (isset($_GET['query']) && !empty($_GET['query'])) {
         // Fetch results as an associative array
         $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        // Store the first property_id in session (modify logic as needed)
+        if (!empty($properties)) {
+            $_SESSION['property_id'] = $properties[0]['property_id']; // Storing the first result's property_id
+        }
+
         // Output JSON response
         echo json_encode($properties);
-        exit; // ⬅️ Prevent duplicate JSON output
+        exit;
     } catch (PDOException $e) {
         echo json_encode(["error" => "SQL Error: " . $e->getMessage()]);
         exit;

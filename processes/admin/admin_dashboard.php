@@ -17,24 +17,36 @@ if ($conn->connect_error) {
 }
 
 // Fetch Monthly Transaction Data
-$monthlyTransactionQuery = $conn->query("SELECT DATE_FORMAT(transaction_date, '%b') AS month, SUM(amount) AS total FROM transactions GROUP BY DATE_FORMAT(transaction_date, '%Y-%m') ORDER BY MIN(transaction_date)");
+$monthlyTransactionQuery = $conn->query("
+    SELECT DATE_FORMAT(transaction_date, '%b') AS month, SUM(amount) AS total
+    FROM transactions
+    GROUP BY DATE_FORMAT(transaction_date, '%Y-%m')
+    ORDER BY MIN(transaction_date)
+");
 
 // Prepare data for Chart.js
 $months = [];
 $totals = [];
 while ($row = $monthlyTransactionQuery->fetch_assoc()) {
-    $months[] = $row['month'];
-    $totals[] = $row['total'];
+    $months[] = $row['month'];  // Month name (e.g., Jan, Feb)
+    $totals[] = $row['total'];  // Total amount
 }
 
 // Convert to JSON for JavaScript
 $monthsJson = json_encode($months);
 $totalsJson = json_encode($totals);
 
-// Fetch total counts and amounts
-$totalProperties = $conn->query("SELECT COUNT(*) AS total FROM properties")->fetch_assoc()['total'];
-$totalTransactions = $conn->query("SELECT COUNT(*) AS total FROM transactions")->fetch_assoc()['total'];
-$totalTransactionAmount = $conn->query("SELECT SUM(amount) AS total FROM transactions")->fetch_assoc()['total'];
+// Fetch Total Properties
+$totalPropertiesQuery = $conn->query("SELECT COUNT(*) AS total FROM properties");
+$totalProperties = $totalPropertiesQuery->fetch_assoc()['total'];
+
+// Fetch Total Transactions
+$totalTransactionsQuery = $conn->query("SELECT COUNT(*) AS total FROM transactions");
+$totalTransactions = $totalTransactionsQuery->fetch_assoc()['total'];
+
+// Fetch Total Transaction Amount
+$totalTransactionAmountQuery = $conn->query("SELECT SUM(amount) AS total FROM transactions");
+$totalTransactionAmount = $totalTransactionAmountQuery->fetch_assoc()['total'];
 
 $conn->close();
 ?>
@@ -47,14 +59,15 @@ $conn->close();
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
             background-color: #f4f4f4;
-            transition: background 0.3s, color 0.3s;
+            transition: background 0.3s;
         }
         .dark-mode {
             background-color: #212529;
-            color: #f8f9fa;
+            color: white;
         }
         .sidebar {
             width: 250px;
@@ -84,20 +97,17 @@ $conn->close();
             border-radius: 10px;
             box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            transition: transform 0.3s;
         }
-        .card:hover {
-            transform: scale(1.05);
+        .dark-mode .card {
+            background: #343a40;
+            color: white;
         }
-        .toggle-container {
-            text-align: right;
-            padding: 10px;
-        }
-        .toggle-button {
-            background: none;
-            border: none;
-            font-size: 24px;
+        #darkModeToggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
             cursor: pointer;
+            font-size: 20px;
         }
     </style>
 </head>
@@ -105,28 +115,25 @@ $conn->close();
     <?php include('layout&others/sidebar.php'); ?>
 
     <div class="content">
-        <div class="toggle-container">
-            <button class="toggle-button" onclick="toggleDarkMode()">🌙</button>
-        </div>
         <h2>Admin Dashboard</h2>
-
+        <span id="darkModeToggle">🌙</span>
         <div class="row">
             <div class="col-md-4">
                 <div class="card p-3">
                     <h4>Total Properties</h4>
-                    <h2><?php echo $totalProperties; ?></h2>
+                    <h2 id="propertyCount">0</h2>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="card p-3">
                     <h4>Total Transactions</h4>
-                    <h2><?php echo $totalTransactions; ?></h2>
+                    <h2 id="transactionCount">0</h2>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="card p-3">
                     <h4>Total Amount Transacted</h4>
-                    <h2>Ksh<?php echo number_format($totalTransactionAmount, 2); ?></h2>
+                    <h2 id="amountCount">Ksh 0</h2>
                 </div>
             </div>
         </div>
@@ -138,6 +145,34 @@ $conn->close();
     </div>
 
     <script>
+        // Dark Mode Persistence
+        if (localStorage.getItem("dark-mode") === "enabled") {
+            document.body.classList.add("dark-mode");
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark-mode");
+            localStorage.setItem("dark-mode", document.body.classList.contains("dark-mode") ? "enabled" : "disabled");
+        }
+        document.getElementById("darkModeToggle").addEventListener("click", toggleDarkMode);
+
+        // Animated Counters
+        function animateCounter(id, target) {
+            let count = 0;
+            const interval = setInterval(() => {
+                count += Math.ceil(target / 50);
+                if (count >= target) {
+                    count = target;
+                    clearInterval(interval);
+                }
+                document.getElementById(id).textContent = count;
+            }, 20);
+        }
+        animateCounter("propertyCount", <?php echo $totalProperties; ?>);
+        animateCounter("transactionCount", <?php echo $totalTransactions; ?>);
+        animateCounter("amountCount", <?php echo $totalTransactionAmount; ?>);
+
+        // Chart.js Line Chart
         const ctx = document.getElementById('transactionChart').getContext('2d');
         const transactionChart = new Chart(ctx, {
             type: 'line',
@@ -154,20 +189,12 @@ $conn->close();
             options: {
                 responsive: true,
                 scales: {
-                    y: { beginAtZero: true }
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
         });
-
-        function toggleDarkMode() {
-            document.body.classList.toggle("dark-mode");
-            const button = document.querySelector(".toggle-button");
-            if (document.body.classList.contains("dark-mode")) {
-                button.textContent = "☀️";
-            } else {
-                button.textContent = "🌙";
-            }
-        }
     </script>
 </body>
 </html>

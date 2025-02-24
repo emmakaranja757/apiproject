@@ -78,9 +78,10 @@ $conn->close();
         </tbody>
     </table>
 
-    <button class="btn btn-secondary" onclick="location.href='add_property.php'">Add Property</button>
-    <button class="btn btn-secondary" onclick="location.href='FilterSearch.php'">Edit Property</button>
-    <button class="btn btn-secondary" onclick="location.href='delete_property.php'">Delete Property</button>
+    <button class="btn btn-secondary" onclick="location.href='add_property.php?action=1'">Add Property</button>
+<button class="btn btn-secondary" onclick="location.href='FilterSearch.php?action=2'">Edit Property</button>
+<button class="btn btn-secondary" onclick="location.href='FilterSearch.php?action=3'">Delete Property</button>
+
 </div>
 
 </body>

@@ -1,5 +1,5 @@
 <?php
-include('../../Dbconn/db_connection.php');
+
 
 function updateProperty() {
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -34,24 +34,32 @@ function updateProperty() {
         echo "<div class='alert alert-warning'>Invalid request method.</div>";
     }
 }
+?>
+
+<?php
 
 function displayProperties() {
-    $conn = getDatabaseConnection();
-    $sql = "SELECT property_id, property_name, location, price, status, created_at, info_id FROM properties";
-    $stmt = $conn->query($sql);
+    global $conn; // Ensure $conn is accessible
+
+    $stmt = $conn->prepare("SELECT * FROM properties");
+    $stmt->execute();
     $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if (!$properties) {
+        echo "<p>No properties found.</p>";
+        return;
+    }
+
+    echo "<table class='table table-striped'>";
+    echo "<tr><th>ID</th><th>Name</th><th>Location</th><th>Price</th><th>Status</th></tr>";
     
-    echo "<table class='table table-bordered'>";
-    echo "<tr><th>ID</th><th>Name</th><th>Location</th><th>Price</th><th>Status</th><th>Created At</th><th>Info ID</th></tr>";
     foreach ($properties as $property) {
         echo "<tr>";
-        echo "<td>{$property['property_id']}</td>";
-        echo "<td>{$property['property_name']}</td>";
-        echo "<td>{$property['location']}</td>";
-        echo "<td>{$property['price']}</td>";
-        echo "<td>{$property['status']}</td>";
-        echo "<td>{$property['created_at']}</td>";
-        echo "<td>{$property['info_id']}</td>";
+        echo "<td>" . htmlspecialchars($property['property_id']) . "</td>";
+        echo "<td>" . htmlspecialchars($property['property_name']) . "</td>";
+        echo "<td>" . htmlspecialchars($property['location']) . "</td>";
+        echo "<td>" . htmlspecialchars($property['price']) . "</td>";
+        echo "<td>" . htmlspecialchars($property['status']) . "</td>";
         echo "</tr>";
     }
     echo "</table>";

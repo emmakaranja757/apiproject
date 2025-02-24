@@ -22,7 +22,7 @@ $(document).ready(function () {
                                     $('#searchProperty').val(property.property_name);
                                     resultsContainer.hide();
 
-                                    // Send property_id to FilterSearch.php via URL
+                                    // ✅ Redirect to `FilterSearch.php` with property_id
                                     window.location.href = 'FilterSearch.php?property_id=' + property.property_id;
                                 });
                             resultsContainer.append(item);

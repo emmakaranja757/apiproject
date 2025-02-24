@@ -1,4 +1,5 @@
 <?php
+session_start(); // ✅ Start session to store property_id and action
 
 include '../../Dbconn/db_connection.php';
 
@@ -7,16 +8,56 @@ if (!$conn) {
     die("Database connection failed.");
 }
 
-// Capture the property_id from the URL and store it in session
-if (isset($_GET['property_id'])) {
-    $_SESSION['property_id'] = $_GET['property_id'];
+// ✅ Capture the action from the URL and store it in session
+if (isset($_GET['action'])) {
+    $_SESSION['action'] = $_GET['action'];
 }
 
-// Redirect to edit_property.php
-if (isset($_SESSION['property_id'])) {
-    header("Location: edit_property.php");
-    exit;
+// ✅ Capture the property_id from the URL and store it in session
+if (isset($_GET['property_id'])) {
+    $_SESSION['property_id'] = $_GET['property_id'];
+
+    // ✅ Redirect based on the stored action
+    if ($_SESSION['action'] == 1) {
+        header("Location: add_property.php");
+    } elseif ($_SESSION['action'] == 2) {
+        header("Location: edit_property.php");
+    } elseif ($_SESSION['action'] == 3) {
+        header("Location: delete_property.php");
+    }
+    exit();
 }
+
+// ✅ Handle the form submission for searching a property
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['search_property'])) {
+    $search_property = $conn->real_escape_string($_POST['search_property']);
+
+    // Query to search property by name, location, or price
+    $query = "SELECT property_id FROM properties 
+              WHERE property_name LIKE '%$search_property%' 
+              OR location LIKE '%$search_property%' 
+              OR price LIKE '%$search_property%' 
+              LIMIT 1";
+
+    $result = $conn->query($query);
+
+    if ($result && $row = $result->fetch_assoc()) {
+        $_SESSION['property_id'] = $row['property_id'];
+
+        // ✅ Redirect based on stored action
+        if ($_SESSION['action'] == 1) {
+            header("Location: add_property.php?id=" . ($_SESSION['property_id'] ?? ''));
+        } elseif ($_SESSION['action'] == 2 && isset($_SESSION['property_id'])) {
+            header("Location: edit_property.php?id=" . $_SESSION['property_id']);
+        }
+        } elseif ($_SESSION['action'] == 3 && isset($_SESSION['property_id'])) {
+            header("Location: delete_property.php?id=" . $_SESSION['property_id']); // Pass ID correctly
+        }
+        
+        exit();
+    } else {
+        echo "<script>alert('Property not found. Please try again.');</script>";
+    }
 
 ?>
 
@@ -42,7 +83,7 @@ if (isset($_SESSION['property_id'])) {
             padding: 20px;
             border-radius: 10px;
             box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-            position: relative; /* Ensures the dropdown stays inside */
+            position: relative;
         }
         .btn-custom {
             background-color: #ffcc00;
@@ -113,7 +154,7 @@ if (isset($_SESSION['property_id'])) {
                 <input type="text" class="form-control" id="searchProperty" name="search_property" autocomplete="off" required>
                 <div id="searchResults" class="dropdown-menu"></div> <!-- 🔹 Dropdown placed inside search-container -->
             </div>
-            <button type="submit" onclick=""class="btn btn-custom">Search</button>
+            <button type="submit" class="btn btn-custom">Search</button>
         </form>
     </div>
 </div>
