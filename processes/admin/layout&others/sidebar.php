@@ -19,7 +19,8 @@ $conn->close();
 
 <div class="sidebar">
     <div class="profile">
-        <img src="profile.jpg" alt="Profile Picture">
+    <img src="/apiproject/IMAGES/profile.jpeg" alt="Profile Picture">
+
         <p><?php echo htmlspecialchars($fullname); ?></p>
     </div>
     <a href="admin_dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
