@@ -27,6 +27,12 @@ $totalProperties = $conn->query("SELECT COUNT(*) AS total FROM properties")->fet
 $totalTransactions = $conn->query("SELECT COUNT(*) AS total FROM transactions")->fetch_assoc()['total'];
 $totalTransactionAmount = $conn->query("SELECT SUM(amount) AS total FROM transactions")->fetch_assoc()['total'];
 
+// Fetch user statistics
+$totalUsers = $conn->query("SELECT COUNT(*) AS total FROM info")->fetch_assoc()['total'];
+$activeUsers = $conn->query("SELECT COUNT(*) AS total FROM info WHERE role='active'")->fetch_assoc()['total'];
+$newUsers = $conn->query("SELECT COUNT(*) AS total FROM info WHERE registration_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)")->fetch_assoc()['total'];
+
+
 // Fetch recent transactions
 $recentTransactions = $conn->query("SELECT transactions.info_id, amount, transaction_date FROM transactions ORDER BY transaction_date DESC LIMIT 5");
 
@@ -40,12 +46,6 @@ $topProperties = $conn->query("
     ORDER BY transactions DESC 
     LIMIT 5
 ");
-
-// Fetch user statistics
-$totalUsers = $conn->query("SELECT COUNT(*) AS total FROM info")->fetch_assoc()['total'];
-$activeUsers = $conn->query("SELECT COUNT(*) AS total FROM info WHERE role='active'")->fetch_assoc()['total'];
-$newUsers = $conn->query("SELECT COUNT(*) AS total FROM info WHERE registration_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)")->fetch_assoc()['total'];
-
 $conn->close();
 ?>
 
@@ -106,14 +106,15 @@ $conn->close();
             </div>
         </div>
         <div class="right-panel w-25">
-            <div class="recent-transactions">
-                <h4>Recent Transactions</h4>
-                <ul>
-                    <?php while ($row = $recentTransactions->fetch_assoc()) {
-                        echo "<li>{$row['info_id']} - $" . number_format($row['amount'], 2) . " - {$row['transaction_date']}</li>";
-                    } ?>
-                </ul>
+            <!-- User Statistics (First) -->
+            <div class="user-stats">
+                <h4>User Statistics</h4>
+                <p>Total Users: <?php echo $totalUsers; ?></p>
+                <p>Active Users: <?php echo $activeUsers; ?></p>
+                <p>New Signups (30 days): <?php echo $newUsers; ?></p>
             </div>
+
+            <!-- Top Properties (Second) -->
             <div class="top-properties">
                 <h4>Top Properties</h4>
                 <ul>
@@ -122,13 +123,18 @@ $conn->close();
                     } ?>
                 </ul>
             </div>
-            <div class="user-stats">
-                <h4>User Statistics</h4>
-                <p>Total Users: <?php echo $totalUsers; ?></p>
-                <p>Active Users: <?php echo $activeUsers; ?></p>
-                <p>New Signups (30 days): <?php echo $newUsers; ?></p>
+
+            <!-- Recent Transactions (Last) -->
+            <div class="recent-transactions">
+                <h4>Recent Transactions</h4>
+                <ul>
+                    <?php while ($row = $recentTransactions->fetch_assoc()) {
+                        echo "<li>{$row['info_id']} - $" . number_format($row['amount'], 2) . " - {$row['transaction_date']}</li>";
+                    } ?>
+                </ul>
             </div>
         </div>
+
     </div>
     <script>
         new Chart(document.getElementById('transactionsChart'), {
