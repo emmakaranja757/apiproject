@@ -79,6 +79,9 @@ $conn->close();
             border-radius: 10px;
             margin-top: 20px;
         }
+        .underline {
+        text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -86,7 +89,7 @@ $conn->close();
     <div class="main-content d-flex">
         <div class="left-panel w-75">
             <div class="header d-flex justify-content-between align-items-center">
-                <h2>Overview</h2>
+               <h2 class="underline">Overview</h2>
             </div>
             <div class="cards row mt-4">
                 <div class="col-md-4">
@@ -109,18 +112,18 @@ $conn->close();
                 </div>
             </div>
             <div class="analytics mt-4">
-                <h3>Transactions Chart Flow</h3>
+            <h3 class="underline">Transactions Chart Flow</h3>
                 <canvas id="transactionsChart"></canvas>
             </div>
         </div>
         <div class="right-panel w-25">
             <div class="user-stats">
-                <h4>User Statistics</h4>
+            <h4 class="underline">User Statistics</h4>
                 <canvas id="userStatsChart"></canvas>
             </div>
             <div class="top-properties card mt-4">
     <div class="card-body">
-        <h4 class="card-title">Top Properties</h4>
+    <h4 class="underline">Top Properties</h4>
         <ul class="list-group list-group-flush">
             <?php while ($row = $topProperties->fetch_assoc()) { ?>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -133,7 +136,7 @@ $conn->close();
 </div>
 
             <div class="recent-transactions">
-                <h4>Recent Transactions</h4>
+            <h4 class="underline">Recent Transactions</h4>
                 <canvas id="recentTransactionsChart"></canvas>
             </div>
         </div>
