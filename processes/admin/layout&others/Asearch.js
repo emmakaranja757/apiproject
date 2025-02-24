@@ -17,13 +17,21 @@ $(document).ready(function () {
                     } else {
                         response.forEach(function (property) {
                             let item = $('<div class="search-item"></div>')
-                                .text(property.property_name + ' - ' + property.location + ' - $' + property.price)
+                                .text(property.property_name + ' - ' + property.location + ' - Ksh' + property.price)
                                 .on('click', function () {
                                     $('#searchProperty').val(property.property_name);
                                     resultsContainer.hide();
 
-                                    // ✅ Redirect to `FilterSearch.php` with property_id
-                                    window.location.href = 'FilterSearch.php?property_id=' + property.property_id;
+                                    // ✅ Get action from URL (if user clicked Edit/Delete first)
+                                    let action = new URLSearchParams(window.location.search).get("action");
+
+                                    if (!action) {
+                                        alert("Please select an action (Edit or Delete) before searching.");
+                                        return;
+                                    }
+
+                                    // ✅ Redirect after selecting property
+                                    window.location.href = 'FilterSearch.php?property_id=' + property.property_id + '&action=' + action;
                                 });
                             resultsContainer.append(item);
                         });

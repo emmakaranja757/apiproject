@@ -27,38 +27,6 @@ if (isset($_GET['property_id'])) {
     }
     exit();
 }
-
-// ✅ Handle the form submission for searching a property
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['search_property'])) {
-    $search_property = $conn->real_escape_string($_POST['search_property']);
-
-    // Query to search property by name, location, or price
-    $query = "SELECT property_id FROM properties 
-              WHERE property_name LIKE '%$search_property%' 
-              OR location LIKE '%$search_property%' 
-              OR price LIKE '%$search_property%' 
-              LIMIT 1";
-
-    $result = $conn->query($query);
-
-    if ($result && $row = $result->fetch_assoc()) {
-        $_SESSION['property_id'] = $row['property_id'];
-
-        // ✅ Redirect based on stored action
-        if ($_SESSION['action'] == 1) {
-            header("Location: add_property.php?id=" . ($_SESSION['property_id'] ?? ''));
-        } elseif ($_SESSION['action'] == 2 && isset($_SESSION['property_id'])) {
-            header("Location: edit_property.php?id=" . $_SESSION['property_id']);
-        }
-        } elseif ($_SESSION['action'] == 3 && isset($_SESSION['property_id'])) {
-            header("Location: delete_property.php?id=" . $_SESSION['property_id']); // Pass ID correctly
-        }
-        
-        exit();
-    } else {
-        echo "<script>alert('Property not found. Please try again.');</script>";
-    }
-
 ?>
 
 <!DOCTYPE html>
