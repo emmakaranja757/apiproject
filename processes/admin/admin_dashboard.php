@@ -46,16 +46,6 @@ $totalUsers = $conn->query("SELECT COUNT(*) AS total FROM info")->fetch_assoc()[
 $activeUsers = $conn->query("SELECT COUNT(*) AS total FROM info WHERE role='active'")->fetch_assoc()['total'];
 $newUsers = $conn->query("SELECT COUNT(*) AS total FROM info WHERE registration_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)")->fetch_assoc()['total'];
 
-// Fetch pending payments
-$pendingPayments = $conn->query("
-    SELECT info.Email, payments.amount, payments.payment_date 
-    FROM payments 
-    JOIN info ON payments.info_id = info.info_id 
-    WHERE payments.status = 'pending' 
-    ORDER BY payments.payment_date ASC 
-    LIMIT 5
-");
-
 $conn->close();
 ?>
 
@@ -137,14 +127,6 @@ $conn->close();
                 <p>Total Users: <?php echo $totalUsers; ?></p>
                 <p>Active Users: <?php echo $activeUsers; ?></p>
                 <p>New Signups (30 days): <?php echo $newUsers; ?></p>
-            </div>
-            <div class="pending-payments">
-                <h4>Pending Payments</h4>
-                <ul>
-                    <?php while ($row = $pendingPayments->fetch_assoc()) {
-                        echo "<li>{$row['user_email']} - $" . number_format($row['amount'], 2) . " - Due: {$row['due_date']}</li>";
-                    } ?>
-                </ul>
             </div>
         </div>
     </div>
