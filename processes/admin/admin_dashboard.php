@@ -10,7 +10,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch monthly transactions for chart
 date_default_timezone_set('UTC');
 $monthlyTransactionQuery = $conn->query("SELECT DATE_FORMAT(transaction_date, '%b') AS month, SUM(amount) AS total FROM transactions GROUP BY DATE_FORMAT(transaction_date, '%Y-%m') ORDER BY MIN(transaction_date)");
 $months = [];
@@ -22,30 +21,25 @@ while ($row = $monthlyTransactionQuery->fetch_assoc()) {
 $monthsJson = json_encode($months);
 $totalsJson = json_encode($totals);
 
-// Fetch summary data
 $totalProperties = $conn->query("SELECT COUNT(*) AS total FROM properties")->fetch_assoc()['total'];
 $totalTransactions = $conn->query("SELECT COUNT(*) AS total FROM transactions")->fetch_assoc()['total'];
 $totalTransactionAmount = $conn->query("SELECT SUM(amount) AS total FROM transactions")->fetch_assoc()['total'];
 
-// Fetch user statistics
 $totalUsers = $conn->query("SELECT COUNT(*) AS total FROM info")->fetch_assoc()['total'];
 $activeUsers = $conn->query("SELECT COUNT(*) AS total FROM info WHERE role='active'")->fetch_assoc()['total'];
 $newUsers = $conn->query("SELECT COUNT(*) AS total FROM info WHERE registration_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)")->fetch_assoc()['total'];
 
+$recentTransactions = $conn->query("SELECT DATE_FORMAT(transaction_date, '%b') AS month, SUM(amount) AS total FROM transactions GROUP BY DATE_FORMAT(transaction_date, '%Y-%m') ORDER BY MIN(transaction_date) LIMIT 5");
+$transactionMonths = [];
+$transactionTotals = [];
+while ($row = $recentTransactions->fetch_assoc()) {
+    $transactionMonths[] = $row['month'];
+    $transactionTotals[] = $row['total'];
+}
+$transactionMonthsJson = json_encode($transactionMonths);
+$transactionTotalsJson = json_encode($transactionTotals);
 
-// Fetch recent transactions
-$recentTransactions = $conn->query("SELECT transactions.info_id, amount, transaction_date FROM transactions ORDER BY transaction_date DESC LIMIT 5");
-
-// Fetch top properties
-
-$topProperties = $conn->query("
-    SELECT properties.property_name, COUNT(transactions.transaction_id) AS transactions 
-    FROM properties 
-    JOIN transactions ON properties.property_id = transactions.property_id 
-    GROUP BY properties.property_id 
-    ORDER BY transactions DESC 
-    LIMIT 5
-");
+$topProperties = $conn->query("SELECT properties.property_name, COUNT(transactions.transaction_id) AS transactions FROM properties JOIN transactions ON properties.property_id = transactions.property_id GROUP BY properties.property_id ORDER BY transactions DESC LIMIT 5");
 $conn->close();
 ?>
 
@@ -65,7 +59,7 @@ $conn->close();
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .analytics, .recent-transactions, .top-properties, .user-stats, .pending-payments {
+        .analytics, .recent-transactions, .top-properties, .user-stats {
             background-color: #fff;
             padding: 15px;
             border-radius: 10px;
@@ -106,39 +100,26 @@ $conn->close();
             </div>
         </div>
         <div class="right-panel w-25">
-            <!-- User Statistics (First) -->
             <div class="user-stats">
                 <h4>User Statistics</h4>
-                <canvas id="userStatsChart"></canvas> <!-- Pie Chart -->
-               
+                <canvas id="userStatsChart"></canvas>
             </div>
-
-            <!-- Container for Top Properties & Recent Transactions -->
-            <div class="top-transactions-container">
-                <!-- Top Properties (Second) -->
-                <div class="top-properties">
-                    <h4>Top Properties</h4>
-                    <ul>
-                        <?php while ($row = $topProperties->fetch_assoc()) {
-                            echo "<li>{$row['property_name']} - {$row['transactions']} sales</li>";
-                        } ?>
-                    </ul>
-                </div>
-
-                <!-- Recent Transactions (Last) -->
-                <div class="recent-transactions">
-                    <h4>Recent Transactions</h4>
-                    <ul>
-                        <?php while ($row = $recentTransactions->fetch_assoc()) {
-                            echo "<li>{$row['info_id']} - $" . number_format($row['amount'], 2) . " - {$row['transaction_date']}</li>";
-                        } ?>
-                    </ul>
-                </div>
+            <div class="top-properties">
+                <h4>Top Properties</h4>
+                <ul>
+                    <?php while ($row = $topProperties->fetch_assoc()) {
+                        echo "<li>{$row['property_name']} - {$row['transactions']} sales</li>";
+                    } ?>
+                </ul>
+            </div>
+            <div class="recent-transactions">
+                <h4>Recent Transactions</h4>
+                <canvas id="recentTransactionsChart"></canvas>
             </div>
         </div>
+    </div>
 
     <script>
-        // Transactions Chart
         new Chart(document.getElementById('transactionsChart'), {
             type: 'line',
             data: {
@@ -154,7 +135,6 @@ $conn->close();
             }
         });
 
-        // Pie Chart for User Statistics
         new Chart(document.getElementById('userStatsChart'), {
             type: 'pie',
             data: {
@@ -162,6 +142,18 @@ $conn->close();
                 datasets: [{
                     data: [<?php echo $activeUsers; ?>, <?php echo $newUsers; ?>, <?php echo $totalUsers; ?>],
                     backgroundColor: ['#36A2EB', '#FFCE56', '#FF6384']
+                }]
+            }
+        });
+
+        new Chart(document.getElementById('recentTransactionsChart'), {
+            type: 'bar',
+            data: {
+                labels: <?php echo $transactionMonthsJson; ?>,
+                datasets: [{
+                    label: 'Recent Transactions',
+                    data: <?php echo $transactionTotalsJson; ?>,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)'
                 }]
             }
         });
