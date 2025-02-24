@@ -94,19 +94,19 @@ $conn->close();
             <div class="cards row mt-4">
                 <div class="col-md-4">
                     <div class="card bg-light-blue">
-                        <h4>Total Sales</h4>
-                        <h2>$<?php echo number_format($totalTransactionAmount, 2); ?></h2>
+                        <h4>Total Transaction</h4>
+                        <h2>Ksh<?php echo number_format($totalTransactionAmount, 2); ?></h2>
                     </div>
                 </div>
-                <div class="col-md-4">
+               <div class="col-md-4">
                     <div class="card bg-light-green">
-                        <h4>Total Profit</h4>
-                        <h2>$762.10</h2>
-                    </div>
+                        <h4>Total Properties</h4>
+                        <h2><?php echo $totalProperties;?></h2>
+                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card bg-light-purple">
-                        <h4>Total Orders</h4>
+                        <h4>Total user paid</h4>
                         <h2><?php echo $totalTransactions; ?></h2>
                     </div>
                 </div>
