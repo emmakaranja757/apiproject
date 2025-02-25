@@ -40,8 +40,8 @@ if (isset($_POST['register'])) {
         exit();
     }
 
-    include('../2F/otp_generator.php');
-    include('../PHPMailer/mailer_demo.php');
+    include('../../2F/otp_generator.php');
+    include('../../PHPMailer/mailer_demo.php');
 
     $otp = generate();
     
@@ -69,7 +69,7 @@ if (isset($_POST['register'])) {
     if (sendMail($email, $Subject, $Body, $name)) {
         echo "<script>
                alert('Email sent successfully. Please check your inbox.');
-               window.location.href='verify_code.php';
+               window.location.href='Uverify_code.php';
               </script>";
     } else {
         echo "<script>alert('Email sending failed. Please check your SMTP settings.');</script>";

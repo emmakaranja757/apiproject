@@ -25,7 +25,7 @@ echo "</pre>";
         echo "<div class='alert alert-success mt-3'>Code verified successfully!</div>";
 
         // Redirect to change password page
-        header("Location: change_password.php?email=" . urlencode($email));
+        header("Location: user_dashboard.php?email=" . urlencode($email));
         exit();
     } else {
         echo "<div class='alert alert-danger mt-3'>Invalid OTP!</div>";
@@ -116,7 +116,7 @@ echo "</pre>";
         ?>
         <p>We have sent a verification code to your email. Please enter the code below.</p>
         
-        <form action="verify_code.php" method="POST" onsubmit="combineCode()">
+        <form action="Uverify_code.php" method="POST" onsubmit="combineCode()">
             <input type="hidden" name="email" value="<?php echo htmlspecialchars($_GET['email'] ?? ''); ?>">
             <input type="hidden" name="code" id="fullCode">
 
