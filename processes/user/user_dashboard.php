@@ -1,17 +1,16 @@
 <?php
 session_start();
-require '../../Dbconn/db_connection.php'; // Include the database connection
+require '../../Dbconn/db_connection.php'; 
 
 if (!isset($_SESSION['email'])) {
     header("Location: login.php");
     exit();
 }
 
-// Get database connection
 $pdo = getDatabaseConnection();
 $email = $_SESSION['email'];
 
-// Fetch user_id and fullname from the database
+// Fetch user details
 $stmt = $pdo->prepare("SELECT info_id, fullname FROM info WHERE Email = :email");
 $stmt->bindParam(':email', $email, PDO::PARAM_STR);
 $stmt->execute();
@@ -21,22 +20,20 @@ if (!$user) {
     die("User not found.");
 }
 
-$userId = $user['info_id']; // Now we have user_id
-$name = $user['fullname'];  // Assign fullname to $name
+$userId = $user['info_id'];
+$name = $user['fullname'];
 
-// Fetch user's total properties (member shares)
+// Fetch user stats
 $stmt = $pdo->prepare("SELECT COUNT(*) AS total_shares FROM properties WHERE info_id = :info_id");
 $stmt->bindParam(':info_id', $userId, PDO::PARAM_INT);
 $stmt->execute();
 $totalShares = $stmt->fetch(PDO::FETCH_ASSOC)['total_shares'] ?? 0;
 
-// Fetch pending balance
 $stmt = $pdo->prepare("SELECT SUM(amount) AS balance FROM transactions WHERE info_id = :info_id");
 $stmt->bindParam(':info_id', $userId, PDO::PARAM_INT);
 $stmt->execute();
 $pendingBalance = $stmt->fetch(PDO::FETCH_ASSOC)['balance'] ?? 0;
 
-// Fetch total amount spent with JOIN fix
 $stmt = $pdo->prepare("
     SELECT SUM(t.amount) AS total_spent 
     FROM transactions t
@@ -67,41 +64,73 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            transition: background 0.3s, color 0.3s;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            text-align: center;
+        }
+        .card.bg-danger {
+            background-color: #ffebee !important;
+            color: #b71c1c !important;
+        }
+        .bg-light-blue { background-color: #E3F2FD; color: #0D47A1; }
+        .bg-light-green { background-color: #E8F5E9; color: #1B5E20; }
+        .bg-light-purple { background-color: #F3E5F5; color: #6A1B9A; }
+        .dark-mode {
+            background-color: #121212;
+            color: white;
+        }
+        .dark-mode .card {
+            background-color: #1e1e1e;
+            color: white;
+        }
+        .dark-mode .table {
+            color: white;
+        }
+        .btn-dark-mode {
+            background-color: #ffa000;
+            color: black;
+            border: none;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-4">
-        <h2>Welcome, <?php echo htmlspecialchars($name); ?></h2>
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>Welcome, <?php echo htmlspecialchars($name); ?></h2>
+            <button class="btn btn-dark-mode" id="darkModeToggle">Dark Mode</button>
+        </div>
 
-        <div class="row">
+        <div class="row mt-4">
             <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Member Shares</h5>
-                        <p class="card-text"><?php echo $totalShares; ?></p>
-                    </div>
+                <div class="card bg-light-blue">
+                    <h5 class="card-title">Member Shares</h5>
+                    <h2><?php echo $totalShares; ?></h2>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Pending Balance</h5>
-                        <p class="card-text">$<?php echo number_format($pendingBalance, 2); ?></p>
-                    </div>
+                <div class="card <?php echo ($pendingBalance > 0) ? 'bg-danger' : 'bg-light-green'; ?>">
+                    <h5 class="card-title">Pending Balance</h5>
+                    <h2>Ksh <?php echo number_format($pendingBalance, 2); ?></h2>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Total Spent</h5>
-                        <p class="card-text">$<?php echo number_format($totalSpent, 2); ?></p>
-                    </div>
+                <div class="card bg-light-purple">
+                    <h5 class="card-title">Total Spent</h5>
+                    <h2>Ksh <?php echo number_format($totalSpent, 2); ?></h2>
                 </div>
             </div>
         </div>
 
         <h3 class="mt-4">Transaction History</h3>
-        <table class="table table-bordered">
-            <thead>
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
                 <tr>
                     <th>Amount</th>
                     <th>Payment Date</th>
@@ -111,7 +140,7 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <tbody>
                 <?php foreach ($transactions as $transaction) : ?>
                     <tr>
-                        <td>$<?php echo number_format($transaction['amount'], 2); ?></td>
+                        <td>Ksh <?php echo number_format($transaction['amount'], 2); ?></td>
                         <td><?php echo $transaction['payment_date']; ?></td>
                         <td><?php echo $transaction['description']; ?></td>
                     </tr>
@@ -119,5 +148,20 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </tbody>
         </table>
     </div>
+
+    <script>
+        // Dark Mode Toggle
+        const toggleButton = document.getElementById('darkModeToggle');
+        const body = document.body;
+
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+        }
+
+        toggleButton.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', body.classList.contains('dark-mode') ? 'enabled' : 'disabled');
+        });
+    </script>
 </body>
 </html>
