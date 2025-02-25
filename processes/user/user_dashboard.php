@@ -72,8 +72,9 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .card {
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 15px;
+            padding: 10px;
             text-align: center;
+            margin-bottom: 10px;
         }
         .card.bg-danger {
             background-color: #ffebee !important;
@@ -101,55 +102,67 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </style>
 </head>
 <body>
-    <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center">
-            <h2>Welcome, <?php echo htmlspecialchars($name); ?></h2>
-            <button class="btn btn-dark-mode" id="darkModeToggle">Dark Mode</button>
-        </div>
-
-        <div class="row mt-4">
-            <div class="col-md-4">
-                <div class="card bg-light-blue">
-                    <h5 class="card-title">Member Shares</h5>
-                    <h2><?php echo $totalShares; ?></h2>
-                </div>
+<body>
+    <div class="container-fluid">
+        <div class="row vh-100">
+            <!-- Sidebar -->
+            <div class="col-md-2 p-0 bg-light position-fixed vh-100 overflow-hidden">
+                <?php include 'user_sidebar.php'; ?>
             </div>
-            <div class="col-md-4">
-                <div class="card <?php echo ($pendingBalance > 0) ? 'bg-danger' : 'bg-light-green'; ?>">
-                    <h5 class="card-title">Pending Balance</h5>
-                    <h2>Ksh <?php echo number_format($pendingBalance, 2); ?></h2>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card bg-light-purple">
-                    <h5 class="card-title">Total Spent</h5>
-                    <h2>Ksh <?php echo number_format($totalSpent, 2); ?></h2>
-                </div>
-            </div>
-        </div>
 
-        <h3 class="mt-4">Transaction History</h3>
-        <table class="table table-bordered table-striped">
-            <thead class="table-dark">
-                <tr>
-                    <th>Amount</th>
-                    <th>Payment Date</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($transactions as $transaction) : ?>
-                    <tr>
-                        <td>Ksh <?php echo number_format($transaction['amount'], 2); ?></td>
-                        <td><?php echo $transaction['payment_date']; ?></td>
-                        <td><?php echo $transaction['description']; ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
+            <!-- Main content area -->
+            <div class="col-md-10 offset-md-2 px-3 mt-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2>Welcome, <?php echo htmlspecialchars($name); ?></h2>
+                    <button class="btn btn-dark-mode" id="darkModeToggle">Dark Mode</button>
+                </div>
 
-    <script>
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <div class="card bg-light-blue">
+                            <h5 class="card-title">Member Shares</h5>
+                            <h2><?php echo $totalShares; ?></h2>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card <?php echo ($pendingBalance > 0) ? 'bg-danger' : 'bg-light-green'; ?>">
+                            <h5 class="card-title">Pending Balance</h5>
+                            <h2>Ksh <?php echo number_format($pendingBalance, 2); ?></h2>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light-purple">
+                            <h5 class="card-title">Total Spent</h5>
+                            <h2>Ksh <?php echo number_format($totalSpent, 2); ?></h2>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="mt-4">Transaction History</h3>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Amount</th>
+                                <th>Payment Date</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($transactions as $transaction) : ?>
+                                <tr>
+                                    <td>Ksh <?php echo number_format($transaction['amount'], 2); ?></td>
+                                    <td><?php echo $transaction['payment_date']; ?></td>
+                                    <td><?php echo $transaction['description']; ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div> <!-- End of col-md-10 -->
+        </div> <!-- End of row -->
+    </div> <!-- End of container-fluid -->
+  <script>
         // Dark Mode Toggle
         const toggleButton = document.getElementById('darkModeToggle');
         const body = document.body;
