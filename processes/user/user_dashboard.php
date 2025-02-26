@@ -29,7 +29,7 @@ $stmt->bindParam(':info_id', $userId, PDO::PARAM_INT);
 $stmt->execute();
 $totalShares = $stmt->fetch(PDO::FETCH_ASSOC)['total_shares'] ?? 0;
 
-$stmt = $pdo->prepare("SELECT SUM(amount) AS balance FROM transactions WHERE info_id = :info_id");
+$stmt = $pdo->prepare("SELECT SUM(balance) AS balance FROM transactions WHERE info_id = :info_id");
 $stmt->bindParam(':info_id', $userId, PDO::PARAM_INT);
 $stmt->execute();
 $pendingBalance = $stmt->fetch(PDO::FETCH_ASSOC)['balance'] ?? 0;

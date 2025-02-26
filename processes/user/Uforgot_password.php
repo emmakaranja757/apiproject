@@ -1,4 +1,6 @@
 <?php
+session_start(); // Start session to store email and OTP
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = htmlspecialchars(trim($_POST['email']));
 
@@ -26,25 +28,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->bindParam(':reset_code', $reset_code);
                 $stmt->bindParam(':email', $email);
                 $stmt->execute();
-                //DEBUG: Print the generated code
-                echo "DEBUG: New Generated Code: ";
 
-                $mail = require __DIR__ . '/mailer_demo.php';
+                // Import mail function
+                require __DIR__ . '/../../PHPMailer/mailer_demo.php';
+
                 // Send reset code to user's email
-                $mail -> setFrom("sawabu@gmail.com","Sawabu Ltd");
-                $mail-> addAddress($email);
-                $mail->Subject = "Password Reset Code";
-                $mail->Body = "Your password reset code is: $reset_code";
-                $mail->Headers = "From: noreply@yourdomain.com\r\n"; // Change the email to a valid one
-               try{
-                $mail->send();
-               }catch(Exception){
-                echo "Message could not be sent. Mailer error: {$mail->ErrorInfo}";
-               }
+                $subject = "Password Reset Code";
+                $body = "Your password reset code is: $reset_code";
 
-                if ($mail) {
-                    // Redirect before any HTML output
-                    header("Location: verify_code.php?email=" . urlencode($email));
+                if (sendMail($email, $subject, $body, "User")) {
+                    // Store email and OTP in session
+                    $_SESSION['email'] = $email;
+                    $_SESSION['otp'] = $reset_code;
+
+                    // Redirect to Changeverify.php
+                    header("Location: Changeverify.php");
                     exit();
                 } else {
                     echo "<div class='alert alert-danger mt-3'>Failed to send email. Please try again later.</div>";
@@ -113,12 +111,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="container">
         <div class="illustration-container">
-            <img src="../IMAGES/forgotpassword.jpeg" alt="Forgot Password Illustration" class="illustration">
+            <img src="../../IMAGES/forgotpassword.jpeg" alt="Forgot Password Illustration" class="illustration">
         </div>
         <div class="form-container">
             <h3 class="mb-3">Forgot Password?</h3>
             <p class="text-muted">Enter your email address </p>
-            <form action="forgot_password.php" method="POST">
+            <form action="Uforgot_password.php" method="POST">
                 <div class="mb-3">
                     <input type="email" class="form-control" id="email" name="email" placeholder="Enter Email Address" required>
                 </div>

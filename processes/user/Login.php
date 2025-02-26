@@ -84,7 +84,7 @@
                 <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
                     <input type="password" class="form-control" id="password" name="password" required>
-                    <a href="forgot_password.php" class="forgot-password">Forgot Password?</a>
+                    <a href="Uforgot_password.php" class="forgot-password">Forgot Password?</a>
                 </div>
                 <button type="submit" class="btn btn-primary">Login</button>
             </form>

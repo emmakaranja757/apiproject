@@ -1,6 +1,6 @@
 <?php
 session_start();
-require '../Dbconn/db_connection.php'; // Ensure this file exists and connects properly
+require '../../Dbconn/db_connection.php'; // Ensure this file exists and connects properly
 
  $pdo = getDatabaseConnection();
 

@@ -1,35 +1,58 @@
 <?php
+session_start(); // Start session to access stored email
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = htmlspecialchars(trim($_POST['email']));
+    if (!isset($_SESSION['email'])) {
+        echo "<script>alert('Session expired! Please request a new reset code.');</script>";
+        exit();
+    }
+
+    $email = $_SESSION['email']; // Retrieve email from session
     $new_password = htmlspecialchars(trim($_POST['password']));
     $confirm_password = htmlspecialchars(trim($_POST['cpassword']));
 
-    // Validate password strength (e.g., minimum 8 characters)
+    // Validate password strength
     if (strlen($new_password) < 8) {
-        echo "<div class='alert alert-danger text-center'>Password must be at least 8 characters long!</div>";
+        echo "<script>alert('Password must be at least 8 characters long!');</script>";
     } elseif ($new_password !== $confirm_password) {
-        echo "<div class='alert alert-danger text-center'>Passwords do not match!</div>";
+        echo "<script>alert('Passwords do not match!');</script>";
     } else {
-        // Hash the new password before storing it
-        $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
+        try {
+            // Database connection with error handling
+            $pdo = new PDO("mysql:host=localhost;dbname=users", "root", "425096", [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+            ]);
 
-        // Update the user's password in the database
-        $pdo = new PDO("mysql:host=localhost;dbname=users", "root", "425096");
-        $stmt = $pdo->prepare("UPDATE info SET password = :password WHERE email = :email");
-        $stmt->bindParam(':password', $hashed_password);
-        $stmt->bindParam(':email', $email);
-        $stmt->execute();
+            // Hash the new password before storing it
+            $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
 
-        // Clear the reset code after successful password change
-        $stmt = $pdo->prepare("UPDATE info SET reset_code = NULL, code_timestamp = NULL WHERE email = :email");
-        $stmt->bindParam(':email', $email);
-        $stmt->execute();
+            // Update the user's password in the database
+            $stmt = $pdo->prepare("UPDATE info SET password = :password WHERE email = :email");
+            $stmt->bindParam(':password', $hashed_password);
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
 
-        echo "<div class='alert alert-success text-center'>Your password has been successfully updated! Redirecting...</div>";
-        header("Location: Login.php");//Redirects to Login.php after 3 seconds
-        exit();
+            // Clear the reset code
+            $stmt = $pdo->prepare("UPDATE info SET reset_code = NULL, code_timestamp = NULL WHERE email = :email");
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
+
+            // Destroy session after password reset
+            session_destroy();
+
+            // Show success message in alert & redirect
+            echo "<script>
+                    alert('Your password has been successfully updated!');
+                    window.location.href = 'login.php';
+                  </script>";
+            exit();
+
+        } catch (PDOException $e) {
+            echo "<script>alert('Database Error: " . $e->getMessage() . "');</script>";
+        }
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -76,10 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="container">
         <h2 class="mb-4">Change Password</h2>
-        <form action="change_password.php" method="POST">
-        <input type="hidden" name="email" value="<?php echo isset($_GET['email']) ? htmlspecialchars($_GET['email']) : ''; ?>">
-
-
+        <form action="Uchange_password.php" method="POST">
             <div class="mb-3 password-container">
                 <label for="password" class="form-label">Enter new password</label>
                 <input type="password" class="form-control" id="password" name="password" required>
